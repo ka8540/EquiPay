@@ -33,3 +33,9 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+package.json 
+package-lock.json
+
+db.yml
+/Users/kayahir/Documents/EquiPay/node_modules/
