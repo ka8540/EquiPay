@@ -1,4 +1,9 @@
 import secrets
+try:
+    from src.utilities.swen_344_db_utils import exec_commit
+except:
+    from src.utilities.swen_344_db_utils import exec_commit
+
 def check_username_and_password(result_username, result_credentials,session_key):
     if result_credentials:
         # If the username and password combination is correct
@@ -23,6 +28,18 @@ def check_username(username):
         return {"message": "User already exists"}, 409  # HTTP 409 Conflict
     return None
 
+def check_session_key(session_key):
+    if session_key:
+        session_key_query = '''SELECT 1 FROM "user" WHERE session_key = %s;'''
+        result = exec_commit(session_key_query, (session_key,))
+        if result:
+           return {"message": "Valid Session Key"},200
+        else:
+            return {"message": "Not a Valid Session Key"},401
+    else:
+        return {"message:": "Session Key not provided"}, 400 
+        
+        
 def generate_session_key():
     print("reached here in model")
     # Generate a 16-byte (128-bit) hex string

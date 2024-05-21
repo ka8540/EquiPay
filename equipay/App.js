@@ -7,19 +7,10 @@ import { Ionicons } from '@expo/vector-icons';
 import Login from './Login';
 import SignUp from './SignUp';
 import Home from './Home';
-import Account from './Account'; // Import the Account component
+import Account from './Account';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
-const HomeStack = createNativeStackNavigator();
-
-function HomeStackScreen() {
-  return (
-    <HomeStack.Navigator>
-      <HomeStack.Screen name="HomeMain" component={Home} options={{ headerShown: false, title: 'Home' }} />
-    </HomeStack.Navigator>
-  );
-}
 
 function MainAppTabs() {
   return (
@@ -38,12 +29,12 @@ function MainAppTabs() {
         },
         tabBarActiveTintColor: 'black',
         tabBarInactiveTintColor: 'gray',
-        tabBarStyle: { 
+        tabBarStyle: {
           backgroundColor: '#D1FFFF', // Set the background color of the tab bar
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeStackScreen} />
+      <Tab.Screen name="Home" component={Home} />
       <Tab.Screen name="Account" component={Account} />
     </Tab.Navigator>
   );
@@ -56,10 +47,7 @@ export default function App() {
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="SignUp" component={SignUp} />
-          <Stack.Screen
-            name="MainApp"
-            component={MainAppTabs}
-          />
+          <Stack.Screen name="MainApp" component={MainAppTabs} />
         </Stack.Navigator>
       </NavigationContainer>
     </View>

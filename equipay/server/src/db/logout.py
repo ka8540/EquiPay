@@ -3,6 +3,7 @@ from psycopg2 import connect  # Include this only if you're directly using psyco
 
 # Import only necessary functions from your utilities and models
 try:
+    from src.model.user import check_session_key
     from src.utilities.swen_344_db_utils import exec_commit
 except ImportError:
     from utilities.swen_344_db_utils import exec_commit
@@ -10,6 +11,10 @@ except ImportError:
 
 def user_logout(kwargs):
     session_key = kwargs.get('session_key')
-    logout_query = '''UPDATE user_authentication SET session_key = NULL WHERE session_key = %s;'''
-    exec_commit(logout_query, (session_key,))
-    return {"message":"User Logout Successfully!"},200
+    vaid_session_key = check_session_key(session_key)
+    if vaid_session_key:      
+        logout_query = '''UPDATE user_authentication SET session_key = NULL WHERE session_key = %s;'''
+        exec_commit(logout_query, (session_key,))
+        return {"message":"User Logout Successfully!"},200
+    else:
+        return{"message":"Invalid User!!"},400
