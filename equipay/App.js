@@ -8,9 +8,23 @@ import Login from './Login';
 import SignUp from './SignUp';
 import Home from './Home';
 import Account from './Account';
+import Menu from './Menu';
+import AddItem from './Add';
+import Group from './Group';
+import Activity from './Activity.Js';
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
+function MenuStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="Menu" component={Menu} />
+      <Stack.Screen name="AddItem" component={AddItem} />
+    </Stack.Navigator>
+  );
+}
 
 function MainAppTabs() {
   return (
@@ -21,21 +35,32 @@ function MainAppTabs() {
 
           if (route.name === 'Home') {
             iconName = focused ? 'home' : 'home-outline';
+          }else if (route.name === 'MenuStack') {
+            iconName = focused ? 'menu' : 'menu-outline';
           } else if (route.name === 'Account') {
             iconName = focused ? 'person' : 'person-outline';
+          }else if (route.name === 'Group') {
+            iconName = focused ? 'people' : 'people-outline';
+          }else if (route.name === 'Activity') {
+            iconName = focused ? 'stats-chart' : 'stats-chart-outline';
           }
+   
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: 'black',
         tabBarInactiveTintColor: 'gray',
         tabBarStyle: {
-          backgroundColor: '#D1FFFF', // Set the background color of the tab bar
+          backgroundColor: '#D1FFFF',
         },
       })}
     >
       <Tab.Screen name="Home" component={Home} />
+      <Tab.Screen name="Group" component={Group} />
+      <Tab.Screen name="MenuStack" component={MenuStack} options={{ title: 'Menu' }} />
+      <Tab.Screen name="Activity" component={Activity} />
       <Tab.Screen name="Account" component={Account} />
+      
     </Tab.Navigator>
   );
 }
