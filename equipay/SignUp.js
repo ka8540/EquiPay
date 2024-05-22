@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SafeAreaView, Alert, StyleSheet, Text, View, TextInput, TouchableOpacity} from 'react-native';
+import { SafeAreaView, Alert, StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
 export default function SignUp({ navigation }) {
@@ -8,7 +8,11 @@ export default function SignUp({ navigation }) {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmpassword,setConfirmPassword] = useState('');
+  const [confirmpassword, setConfirmPassword] = useState('');
+
+  const navigateToLogin = () => {
+    navigation.navigate('Login');
+  };
 
   const handleSubmit = () => {
     if (password !== confirmpassword) {
@@ -19,14 +23,12 @@ export default function SignUp({ navigation }) {
       Alert.alert("Invalid Input", "Please fill in all fields.");
       return;
     }
-    if(!email.includes('@')){
-      Alert.alert("Invalid Email","email should contain @.")
+    if (!email.includes('@')) {
+      Alert.alert("Invalid Email", "Email should contain @.");
       return;
     }
-    // Endpoint URL
+    
     const url = 'http://127.0.0.1:5000/signUp';
-  
-    // Form data to be sent
     const formData = {
       firstname: firstname,
       lastname: lastname,
@@ -35,69 +37,63 @@ export default function SignUp({ navigation }) {
       password: password,
       confirmpassword: confirmpassword,
     };
-  
-    // POST request options
+
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData),
     };
-  
-    fetch(url, requestOptions)
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      } else if (response.status === 409) {
-        // Correctly handle the case when a user already exists
-        Alert.alert("User Exists", "This username is already taken. Please choose another one.");
-        return Promise.reject(new Error('User already exists'));
-      } else {
-        throw new Error('Network response was not ok.');
-      }
-    })
-    .then(data => {
-      console.log(data);
-      Alert.alert("User Registered", "Registration has been completed");
-      navigation.navigate('SignUp');
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Login' }],
-      });
-    })
-    .catch(error => {
-      console.error('There was an error!', error);
-      if (error.message !== 'User already exists') {
-        Alert.alert("Network Error", "Failed to submit form. Please check your network connection and try again.");
-      }
-    });
 
+    fetch(url, requestOptions)
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else if (response.status === 409) {
+          Alert.alert("User Exists", "This username is already taken. Please choose another one.");
+          return Promise.reject(new Error('User already exists'));
+        } else {
+          throw new Error('Network response was not ok.');
+        }
+      })
+      .then(data => {
+        console.log(data);
+        Alert.alert("User Registered", "Registration has been completed");
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Login' }],
+        });
+      })
+      .catch(error => {
+        console.error('There was an error!', error);
+        if (error.message !== 'User already exists') {
+          Alert.alert("Network Error", "Failed to submit form. Please check your network connection and try again.");
+        }
+      });
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="auto" />
       
-      {/* Orange Navbar */}
       <View style={styles.navbar}>
       </View>
       
-      {/* App Content */}
       <View style={styles.content}>
         <Text style={styles.header}>Sign Up</Text>
         <View style={styles.row}>
-        <TextInput
-          style={[styles.input, styles.halfInput]}
-          placeholder="Firstname"
-          value={firstname}
-          onChangeText={setFirstName}
-        />
-        <TextInput
-          style={[styles.input, styles.halfInput]}
-          placeholder="Lastname"
-          value={lastname}
-          onChangeText={setLastName}
-        />
-      </View>
+          <TextInput
+            style={[styles.input, styles.halfInput]}
+            placeholder="Firstname"
+            value={firstname}
+            onChangeText={setFirstName}
+          />
+          <TextInput
+            style={[styles.input, styles.halfInput]}
+            placeholder="Lastname"
+            value={lastname}
+            onChangeText={setLastName}
+          />
+        </View>
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -135,6 +131,10 @@ export default function SignUp({ navigation }) {
         <TouchableOpacity onPress={handleSubmit} style={styles.button}>
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
+        
+        <Text style={styles.signupPrompt}>
+          Already have an Account? <Text onPress={navigateToLogin} style={styles.signupLink}>SignIn</Text>
+        </Text>
       </View>
     </SafeAreaView>
   );
@@ -202,6 +202,13 @@ const styles = StyleSheet.create({
   },
   halfInput: {
     width: '48%', 
+  },
+  signupPrompt: {
+    marginTop: 20,
+    fontSize: 14,
+  },
+  signupLink: {
+    fontWeight: 'bold',
+    color: 'blue',
   }
-  
 });

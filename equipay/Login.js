@@ -58,7 +58,7 @@ export default function Login({ navigation }) {
       <StatusBar style="auto" />
       <View style={styles.content}>
         <Image 
-          source={{ uri: '/Users/kayahir/Documents/EquiPay/equipay/images/Equipay.png' }} 
+          source={{ uri: '/Users/kayahir/Documents/EquiPay/equipay/images/Equipay.png' }}  
           style={styles.image}
         />
         <Text style={styles.header}>Login</Text>
@@ -81,7 +81,7 @@ export default function Login({ navigation }) {
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
         <Text style={styles.signupPrompt}>
-          Don't have an account? <Text onPress={navigateToSignUp} style={styles.signupLink}>SignUp</Text>
+          Don't have an account? <Text onPress={navigateToSignUp} style={styles.signupLink}>Sign Up</Text>
         </Text>
       </View>
     </SafeAreaView>

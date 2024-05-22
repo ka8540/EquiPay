@@ -3,9 +3,10 @@ from psycopg2 import connect  # Include this only if you're directly using psyco
 
 # Import only necessary functions from your utilities and models
 try:
-    from src.model.user import check_session_key
+    from model.user import check_session_key
     from src.utilities.swen_344_db_utils import exec_commit
 except ImportError:
+    from model.user import check_session_key
     from utilities.swen_344_db_utils import exec_commit
 
 

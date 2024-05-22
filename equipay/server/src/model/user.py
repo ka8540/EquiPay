@@ -1,8 +1,8 @@
 import secrets
 try:
-    from src.utilities.swen_344_db_utils import exec_commit
+    from utilities.swen_344_db_utils import exec_commit
 except:
-    from src.utilities.swen_344_db_utils import exec_commit
+    from utilities.swen_344_db_utils import exec_commit
 
 def check_username_and_password(result_username, result_credentials,session_key):
     if result_credentials:
@@ -30,7 +30,7 @@ def check_username(username):
 
 def check_session_key(session_key):
     if session_key:
-        session_key_query = '''SELECT 1 FROM "user" WHERE session_key = %s;'''
+        session_key_query = '''SELECT username FROM "user" WHERE session_key = %s;'''
         result = exec_commit(session_key_query, (session_key,))
         if result:
            return {"message": "Valid Session Key"},200
