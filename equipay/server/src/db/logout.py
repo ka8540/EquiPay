@@ -9,13 +9,12 @@ except ImportError:
     from model.user import check_session_key
     from utilities.swen_344_db_utils import exec_commit
 
-
 def user_logout(kwargs):
     session_key = kwargs.get('session_key')
-    vaid_session_key = check_session_key(session_key)
-    if vaid_session_key:      
-        logout_query = '''UPDATE user_authentication SET session_key = NULL WHERE session_key = %s;'''
+    valid_session_key = check_session_key(session_key)
+    if valid_session_key:      
+        logout_query = '''UPDATE "user" SET session_key = NULL WHERE session_key = %s;'''
         exec_commit(logout_query, (session_key,))
-        return {"message":"User Logout Successfully!"},200
+        return {"message": "User Logout Successfully!"}, 200
     else:
-        return{"message":"Invalid User!!"},400
+        return {"message": "Invalid User!!"}, 400

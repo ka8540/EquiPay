@@ -1,5 +1,6 @@
 import hashlib
 import secrets
+
 try:
     from src.utilities.swen_344_db_utils import exec_get_all, exec_commit
 except ImportError:
@@ -9,13 +10,15 @@ def list_info_items():
     result = exec_get_all('''SELECT * FROM "user"''')
     return result
 
-def user_signup(**kwargs):
+def user_signup(bcrypt, **kwargs):
     firstname = kwargs.get('firstname')
     lastname = kwargs.get('lastname')
     username = kwargs.get('username')
     password_kwargs = kwargs.get('password')
     email = kwargs.get('email')
-    password = hashlib.sha224(password_kwargs.encode()).hexdigest()
+    
+    # Hash the password using bcrypt
+    password = bcrypt.generate_password_hash(password_kwargs).decode('utf-8')
 
     # Check if user already exists based on username
     user_exists_query = 'SELECT username FROM "user" WHERE username = %s;'
@@ -28,7 +31,7 @@ def user_signup(**kwargs):
 
     # If the user does not exist, proceed to insert the new user
     tuple_to_insert = (firstname, lastname, username, password, email)
-    query_insert = 'INSERT INTO "user" (firstname, lastname, username, hashed_password, email) VALUES (%s, %s, %s, %s, %s);'
+    query_insert = 'INSERT INTO "user" (firstname, lastname, username, password, email) VALUES (%s, %s, %s, %s, %s);'
     exec_commit(query_insert, tuple_to_insert)
 
     # Return a success message (consider also returning an appropriate status code)

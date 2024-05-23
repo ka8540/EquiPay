@@ -12,18 +12,19 @@ export default function Account({ navigation }) {
     useEffect(() => {
         const fetchUserDetails = async () => {
             try {
-                // Retrieve the session key from storage
+                // Retrieve the session key and token from storage
                 const sessionKey = await AsyncStorage.getItem('sessionKey');
-                if (!sessionKey) {
-                    console.error('Session key not found');
+                const token = await AsyncStorage.getItem('jwt_token');
+                if (!sessionKey || !token) {
+                    console.error('Session key or token not found');
                     return;
                 }
 
                 const response = await fetch('http://127.0.0.1:5000/userdetail', {
                     method: 'GET',
                     headers: {
-                        // Include the session key in the request headers
-                        'X-Session-Key': sessionKey,
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
                     },
                 });
 
@@ -60,45 +61,47 @@ export default function Account({ navigation }) {
                 { 
                     text: "Yes", onPress: async () => {
                         console.log("Logout Pressed");
-                        // Retrieve the session key from storage
+                        // Retrieve the session key and token from storage
                         const sessionKey = await AsyncStorage.getItem('sessionKey');
-                        if (sessionKey) {
+                        const token = await AsyncStorage.getItem('jwt_token');
+                        if (sessionKey && token) {
                             // Send a POST request to the backend to notify about the logout
                             try {
                                 const response = await fetch('http://127.0.0.1:5000/logout', {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
-                                        // Optionally include the session key in the headers if required
-                                        'X-Session-Key': sessionKey
-    
+                                        'Authorization': `Bearer ${token}`,
                                     },
                                     body: JSON.stringify({
-                                        session_key: sessionKey, // Include session key in the body if this is your backend's expected format
+                                        session_key: sessionKey,
                                     }),
                                 });
-    
+
                                 if (!response.ok) {
                                     throw new Error('Failed to notify backend about logout');
                                 }
-    
+
                                 // Handle response from the backend, if necessary
                                 console.log('Logout successful, backend notified');
-                                
-                                // Optionally remove sessionKey from AsyncStorage here, if required
-                                // await AsyncStorage.removeItem('sessionKey');
-    
+
+                                // Remove sessionKey and token from AsyncStorage
+                                await AsyncStorage.removeItem('sessionKey');
+                                await AsyncStorage.removeItem('jwt_token');
+
                                 // Navigate back to the login screen or perform other cleanup
                                 navigation.reset({
                                     index: 0,
                                     routes: [{ name: 'Login' }],
                                 });
-    
+
                             } catch (error) {
                                 console.error('There was an error notifying the backend about logout:', error);
+                                Alert.alert("Logout Error", error.message);
                             }
                         } else {
-                            console.log('No session key found');
+                            console.log('No session key or token found');
+                            Alert.alert("Logout Error", "No session key or token found.");
                         }
                     } 
                 }
@@ -108,7 +111,6 @@ export default function Account({ navigation }) {
 
     return (
         <SafeAreaView style={styles.container}>
-
             {/* Main Content */}
             <View style={styles.content}>
                 <MaterialCommunityIcons name="account-circle" size={100} color="black" />

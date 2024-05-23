@@ -37,15 +37,22 @@ export default function Login({ navigation }) {
         }
       })
       .then(data => {
-        AsyncStorage.setItem('sessionKey', data.sessionKey)
-          .then(() => {
-            Alert.alert("Login Successfully");
-            navigation.reset({
-              index: 0,
-              routes: [{ name: 'MainApp' }],
-            });
-          })
-          .catch(error => console.error('AsyncStorage error: ', error));
+        if (data.sessionKey && data.access_token) {
+          Promise.all([
+            AsyncStorage.setItem('sessionKey', data.sessionKey),
+            AsyncStorage.setItem('jwt_token', data.access_token)
+          ])
+            .then(() => {
+              Alert.alert("Login Successfully");
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'MainApp' }],
+              });
+            })
+            .catch(error => console.error('AsyncStorage error: ', error));
+        } else {
+          throw new Error('No session key or token received');
+        }
       })
       .catch(error => {
         Alert.alert("Login Error", error.message);
