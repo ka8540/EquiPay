@@ -15,6 +15,8 @@ export default function Account({ navigation }) {
                 // Retrieve the session key and token from storage
                 const sessionKey = await AsyncStorage.getItem('sessionKey');
                 const token = await AsyncStorage.getItem('jwt_token');
+                console.log(sessionKey);
+                console.log(token);
                 if (!sessionKey || !token) {
                     console.error('Session key or token not found');
                     return;
