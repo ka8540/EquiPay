@@ -3,11 +3,11 @@ from flask_restful import Resource, reqparse
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 try:
-    from src.db.signup import list_info_items
-    from src.model.user import check_session_key
+    from src.db.user_details import list_info_items
+    from src.model.user import check_session_key, get_username
 except ImportError:
-    from db.signup import list_info_items
-    from model.user import check_session_key
+    from db.user_details import list_info_items
+    from model.user import check_session_key, get_username
 
 class ListUsersApi(Resource):
     def __init__(self, bcrypt):
@@ -28,11 +28,15 @@ class ListUsersApi(Resource):
         print("Session Key:", session_key)
 
         # Verify session key
-        if not check_session_key(session_key):
+        username = get_username(session_key)
+        if not username:
             return make_response(jsonify({"message": "Invalid session key"}), 401)
+        
+        print("Username associated with session key:", username)
 
         # Get user identity from JWT
         current_user = get_jwt_identity()
 
-        # If session key is valid, return the list of users
-        return jsonify(list_info_items())
+        # If session key is valid, return the list of users excluding the current user
+        return jsonify(list_info_items(username))
+

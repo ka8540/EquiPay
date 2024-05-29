@@ -5,6 +5,14 @@ try:
 except ImportError:
     from utilities.swen_344_db_utils import exec_get_all
 
+def list_info_items(username):
+    print("Username:",username)
+    query = '''
+    SELECT * FROM "user"
+    WHERE username != %s
+    '''
+    result = exec_get_all(query, (username,))
+    return result
 
 def list_user_detail(username):
     print('User entered to get the detail!!')

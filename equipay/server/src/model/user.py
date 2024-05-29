@@ -1,8 +1,8 @@
 import secrets
 try:
-    from utilities.swen_344_db_utils import exec_commit
+    from utilities.swen_344_db_utils import exec_commit, exec_get_all
 except:
-    from utilities.swen_344_db_utils import exec_commit
+    from utilities.swen_344_db_utils import exec_commit, exec_get_all
 
 def check_username_and_password(result_username, result_credentials,session_key):
     if result_credentials:
@@ -44,4 +44,25 @@ def generate_session_key():
     print("reached here in model")
     # Generate a 16-byte (128-bit) hex string
     return secrets.token_hex(16)
+
+def get_username(session_key):
+    print("session_key inside the get_username:", session_key)
+    if session_key:
+        session_key_query = '''SELECT username FROM "user" WHERE session_key = %s;'''
+        try:
+            result = exec_get_all(session_key_query, (session_key,))
+            print("Result from exec_get_all:", result)
+            if result:
+                return result[0][0]  # Return the first row's first column (username)
+            else:
+                print("No result found for the given session key.")
+                return None  # Return None if no result
+        except Exception as e:
+            print("Error executing query:", e)
+            return None
+    else:
+        print("Session key is None or empty.")
+        return None  # Return None if no session key provided
+
+ 
 

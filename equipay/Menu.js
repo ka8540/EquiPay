@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Button, FlatList, Text, StyleSheet, Alert } from 'react-native';
+import { View, Button, FlatList, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Menu = ({ navigation }) => {
   const [users, setUsers] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,7 +30,7 @@ const Menu = ({ navigation }) => {
         const transformedData = response.data.map(user => ({
           id: user[0],
           name: user[1],
-          email: user[5],
+          email: user[2],
         }));
 
         setUsers(transformedData);
@@ -44,12 +45,25 @@ const Menu = ({ navigation }) => {
     fetchUsers();
   }, []);
 
+  const handleSelectUser = (userId) => {
+    setSelectedUserId(userId);
+    // Perform any action here such as navigation or displaying user details
+  };
+
   const renderItem = ({ item }) => (
-    <View style={styles.row}>
-      <Text style={styles.cell}>{item.id}</Text>
-      <Text style={styles.cell}>{item.name}</Text>
-      <Text style={styles.cell}>{item.email}</Text>
-    </View>
+    <TouchableOpacity
+      style={[
+        styles.row,
+        { backgroundColor: item.id === selectedUserId ? '#d0ebff' : '#fff' }
+      ]}
+      onPress={() => handleSelectUser(item.id)}
+    >
+      <View style={styles.cellContainer}>
+        <Text style={styles.cell}>{item.name}</Text>
+        <Text style={styles.cell}>{item.email}</Text>
+      </View>
+      <Text style={styles.radioText}>{item.id === selectedUserId ? '🔘' : '⚪️'}</Text>
+    </TouchableOpacity>
   );
 
   return (
@@ -66,13 +80,6 @@ const Menu = ({ navigation }) => {
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
           contentContainerStyle={styles.listContainer}
-          ListHeaderComponent={
-            <View style={styles.headerRow}>
-              <Text style={styles.headerCell}>ID</Text>
-              <Text style={styles.headerCell}>Name</Text>
-              <Text style={styles.headerCell}>Email</Text>
-            </View>
-          }
         />
       )}
     </View>
@@ -83,36 +90,31 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f9f9f9', // Slightly off-white to distinguish from item background
+    backgroundColor: '#f9f9f9',
   },
   listContainer: {
     flexGrow: 1,
   },
   row: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 10,
+    paddingVertical: 15,
+    paddingHorizontal: 10,
     borderBottomWidth: 1,
     borderColor: '#ccc',
-    backgroundColor: '#fff', // White background for items
+  },
+  cellContainer: {
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'space-between',
   },
   cell: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 16, // Larger font size
-    color: '#333', // Darker text for better visibility
+    fontSize: 16,
+    color: '#333',
   },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 10,
-    backgroundColor: '#ddd', // Distinguish header with a grey background
-  },
-  headerCell: {
-    flex: 1,
-    textAlign: 'center',
-    fontWeight: 'bold',
-    fontSize: 18, // Even larger font size for headers
+  radioText: {
+    fontSize: 20,
   },
 });
 
