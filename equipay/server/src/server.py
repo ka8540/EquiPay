@@ -11,6 +11,7 @@ try:
     from api.logout_api import LogoutAPI
     from api.userlist_api import ListUsersApi
     from api.account_api import AccountApi
+    from api.password_api import PasswordApi
 except ImportError:
     from utilities.swen_344_db_utils import exec_sql_file
     from api.login_api import LoginAPI
@@ -18,6 +19,7 @@ except ImportError:
     from api.logout_api import LogoutAPI
     from api.userlist_api import ListUsersApi
     from api.account_api import AccountApi
+    from api.password_api import PasswordApi
 
 app = Flask(__name__)
 CORS(app)
@@ -32,7 +34,7 @@ api.add_resource(LoginAPI, '/login', resource_class_kwargs={'bcrypt': bcrypt})
 api.add_resource(LogoutAPI, '/logout')
 api.add_resource(ListUsersApi, '/listUsers', resource_class_kwargs={'bcrypt': bcrypt})
 api.add_resource(AccountApi, '/accountapi', resource_class_kwargs={'bcrypt': bcrypt})
-
+api.add_resource(PasswordApi, '/passwordapi', resource_class_kwargs={'bcrypt': bcrypt})
 
 def setup_database():
     print("Loading db")

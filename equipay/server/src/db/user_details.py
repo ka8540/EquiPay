@@ -1,9 +1,12 @@
 import hashlib
 import secrets
+from flask_bcrypt import Bcrypt
 try:
-    from src.utilities.swen_344_db_utils import exec_get_all
+    from src.utilities.swen_344_db_utils import exec_get_all, exec_commit
 except ImportError:
-    from utilities.swen_344_db_utils import exec_get_all
+    from utilities.swen_344_db_utils import exec_get_all, exec_commit
+
+bcrypt = Bcrypt()
 
 def list_info_items(username):
     print("Username:", username)
@@ -36,13 +39,50 @@ def verify_session_key(session_key):
     return None
 
 def update_user_detail(username, **kwargs):
+    print("Got here in the user_update_detail")
+    print("Username:", username)
+    print("Update parameters:", kwargs)  # Correct usage of print with kwargs
+    
+    # Creating the SQL SET clause dynamically based on provided kwargs
     set_clause = ', '.join([f"{key} = %s" for key in kwargs.keys()])
     values = list(kwargs.values())
-    values.append(username)  
-    query = f'''UPDATE "user" SET {set_clause} WHERE username = %s;'''
+    values.append(username)  # Add username at the end for the WHERE clause
+    
+    # Construct the SQL query
+    query = f"UPDATE \"user\" SET {set_clause} WHERE username = %s;"
+    
     try:
-        exec_get_all(query, tuple(values))  
+        # Execute the query
+        exec_commit(query, tuple(values))  
         return True
     except Exception as e:
         print("Failed to update user details:", str(e))
         return False
+
+
+def get_password(username, old_password):
+    print("reached get_password!!")
+    print("Username:", username)
+    print("Password Attempt:", old_password)
+    
+    query = '''SELECT password FROM "user" WHERE username = %s;'''
+    result = exec_get_all(query, (username,))  # Assuming this returns a list of tuples
+    
+    if result:
+        stored_password_hash = result[0][0]  # Assuming password is the first element of the first tuple
+        print("Stored Hash:", stored_password_hash)
+        
+        # Use bcrypt to check if the provided password matches the stored hash
+        if bcrypt.check_password_hash(stored_password_hash, old_password):
+            print("Password is correct!")
+            return True
+        else:
+            print("Password is incorrect.")
+    else:
+        print("No user found with that username.")
+    
+    return False
+
+def update_passord(hashed_password,username):
+    query = '''UPDATE "user" SET password = %s WHERE username = %s'''
+    result = exec_commit(query,(hashed_password,username))
