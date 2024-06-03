@@ -30,7 +30,7 @@ const Menu = ({ navigation }) => {
         const transformedData = response.data.map(user => ({
           id: user[0],
           name: user[1],
-          email: user[2],
+          email: user[3],
         }));
 
         setUsers(transformedData);
@@ -47,7 +47,7 @@ const Menu = ({ navigation }) => {
 
   const handleSelectUser = (userId) => {
     setSelectedUserId(userId);
-    // Perform any action here such as navigation or displaying user details
+    navigation.navigate('AddItem', { userId });
   };
 
   const renderItem = ({ item }) => (
@@ -59,7 +59,6 @@ const Menu = ({ navigation }) => {
       onPress={() => handleSelectUser(item.id)}
     >
       <View style={styles.cellContainer}>
-        <Text style={styles.cell}>{item.name}</Text>
         <Text style={styles.cell}>{item.email}</Text>
       </View>
       <Text style={styles.radioText}>{item.id === selectedUserId ? '🔘' : '⚪️'}</Text>
@@ -68,10 +67,6 @@ const Menu = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Button
-        title="Add Item"
-        onPress={() => navigation.navigate('AddItem')}
-      />
       {loading ? (
         <Text>Loading...</Text>
       ) : (
@@ -107,7 +102,7 @@ const styles = StyleSheet.create({
   cellContainer: {
     flexDirection: 'row',
     flex: 1,
-    justifyContent: 'space-between',
+    paddingLeft: 20,
   },
   cell: {
     fontSize: 16,
