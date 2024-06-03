@@ -52,8 +52,8 @@ export default function Account({ navigation }) {
         {
             id: '1',
             title: 'Profile',
-            icon: 'account-circle',
-            action: () => navigation.navigate('EditProfile')
+            icon: 'account-circle-outline',
+            action: () => navigation.navigate('ViewProfile')
         },
         {
             id: '2',
@@ -66,6 +66,12 @@ export default function Account({ navigation }) {
             title: 'Advanced Features',
             icon: 'feature-search',
             action: () => navigation.navigate('AdvancedFeatures')
+        },
+        {
+            id: '4',
+            title: 'Edit Profile',
+            icon: 'account-edit-outline',
+            action: () => navigation.navigate('EditProfile')
         },
     ];
 
@@ -97,7 +103,7 @@ const styles = StyleSheet.create({
     },
     item: {
         flexDirection: 'row',
-        padding: 30, 
+        padding: 22, 
         marginVertical: 12, 
         alignItems: 'center',
         borderBottomWidth: 1,  

@@ -16,16 +16,17 @@ def list_info_items(username):
 
 def list_user_detail(username):
     print('User entered to get the detail!!')
-    query = '''SELECT firstname, lastname, username, email, profile_pic_url FROM "user" WHERE username = %s;'''
-    users = exec_get_all(query, (username,)) 
+    query = '''SELECT firstname, lastname, username, email FROM "user" WHERE username = %s;'''
+    users = exec_get_all(query, (username,))
     print(users, 'user detail!!')
     
     if users:
-        user_details = [{'firstname': user[0], 'lastname': user[1], 'username': user[2], 'email': user[3], 'profile_pic_url': user[4]} for user in users]
+        user_details = [{'firstname': user[0], 'lastname': user[1], 'username': user[2], 'email': user[3]} for user in users]
     else:
         user_details = []
     
     return user_details
+
 
 def verify_session_key(session_key):
     query = '''SELECT username FROM user_authentication WHERE session_key = %s;'''

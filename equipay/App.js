@@ -12,7 +12,10 @@ import Menu from './Menu';
 import AddItem from './Add';
 import Group from './Group';
 import Activity from './Activity.Js';
-
+import ViewProfile from './ViewProfile';
+import ChangePassword from './ChangePassword';
+import AdvancedFeatures from './AdvancedFeatures'; // Assuming you have this component
+import EditProfile from './EditProfile'; // Assuming you have this component
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -32,27 +35,22 @@ function MainAppTabs() {
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
-
           if (route.name === 'Home') {
             iconName = focused ? 'home' : 'home-outline';
-          }else if (route.name === 'MenuStack') {
+          } else if (route.name === 'MenuStack') {
             iconName = focused ? 'menu' : 'menu-outline';
           } else if (route.name === 'Account') {
             iconName = focused ? 'person' : 'person-outline';
-          }else if (route.name === 'Group') {
+          } else if (route.name === 'Group') {
             iconName = focused ? 'people' : 'people-outline';
-          }else if (route.name === 'Activity') {
+          } else if (route.name === 'Activity') {
             iconName = focused ? 'stats-chart' : 'stats-chart-outline';
           }
-   
-
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: 'black',
         tabBarInactiveTintColor: 'gray',
-        tabBarStyle: {
-          backgroundColor: '#D1FFFF',
-        },
+        tabBarStyle: { backgroundColor: '#D1FFFF' },
       })}
     >
       <Tab.Screen name="Home" component={Home} />
@@ -60,7 +58,6 @@ function MainAppTabs() {
       <Tab.Screen name="MenuStack" component={MenuStack} options={{ title: 'Menu' }} />
       <Tab.Screen name="Activity" component={Activity} />
       <Tab.Screen name="Account" component={Account} />
-      
     </Tab.Navigator>
   );
 }
@@ -69,10 +66,14 @@ export default function App() {
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
       <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="SignUp" component={SignUp} />
           <Stack.Screen name="MainApp" component={MainAppTabs} />
+          <Stack.Screen name="ViewProfile" component={ViewProfile} />
+          <Stack.Screen name="ChangePassword" component={ChangePassword} />
+          <Stack.Screen name="AdvancedFeatures" component={AdvancedFeatures} />
+          <Stack.Screen name="EditProfile" component={EditProfile} />
         </Stack.Navigator>
       </NavigationContainer>
     </View>
