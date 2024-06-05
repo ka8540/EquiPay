@@ -6,6 +6,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 const ViewProfile = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [userData, setUserData] = useState({});
+    const [profileImageUrl, setProfileImageUrl] = useState(null);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -19,23 +20,24 @@ const ViewProfile = ({ navigation }) => {
             }
 
             try {
-                const response = await fetch('http://127.0.0.1:5000/accountapi', {
+                // Fetch user data
+                const userResponse = await fetch('http://127.0.0.1:5000/accountapi', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
-                        'session-key': sessionKey,
+                        'Session-Key': sessionKey,
                         'Content-Type': 'application/json'
                     }
                 });
 
-                if (!response.ok) {
+                if (!userResponse.ok) {
                     throw new Error("Failed to fetch user data");
                 }
 
-                const data = await response.json();
+                const userData = await userResponse.json();
 
-                if (data.length > 0) {
-                    const userDetails = data[0];
+                if (userData && userData.length > 0) {
+                    const userDetails = userData[0];
                     setUserData({
                         username: userDetails.username,
                         firstname: userDetails.firstname,
@@ -44,9 +46,29 @@ const ViewProfile = ({ navigation }) => {
                 } else {
                     console.error("Received empty data array");
                 }
+
+                // Fetch profile image URL
+                const imageResponse = await fetch('http://127.0.0.1:5000/upload', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Session-Key': sessionKey
+                    }
+                });
+
+                if (!imageResponse.ok) {
+                    throw new Error("Failed to fetch profile image");
+                }
+
+                const imageResult = await imageResponse.json();
+                if (imageResult.url) {
+                    setProfileImageUrl(imageResult.url[0]);  // Assuming the URL is the first element in the array
+                } else {
+                    setProfileImageUrl(null);  // Use null for no image and handle the UI accordingly
+                }
                 setIsLoading(false);
             } catch (error) {
-                console.error("Error fetching user data:", error);
+                console.error("Error fetching data:", error);
                 setIsLoading(false);
             }
         };
@@ -61,6 +83,13 @@ const ViewProfile = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <View style={styles.card}>
+                {profileImageUrl ? (
+                    <Image source={{ uri: profileImageUrl }} style={styles.profilePic} />
+                ) : (
+                    <View style={[styles.profilePic, styles.profilePicPlaceholder]}>
+                        <Text style={styles.placeholderText}>No Image Available</Text>
+                    </View>
+                )}
                 <Text style={styles.title}>User Profile</Text>
                 <View style={styles.detailRow}>
                     <MaterialIcons name="person-outline" size={24} color="black" />
@@ -74,11 +103,11 @@ const ViewProfile = ({ navigation }) => {
                     <MaterialIcons name="face" size={24} color="black" />
                     <Text style={styles.detail}>Last Name: {userData.lastname}</Text>
                 </View>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ImageUploder')}>
+                    <Text style={styles.buttonText}>Update Profile Picture</Text>
+                </TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
                     <Text style={styles.buttonText}>Back to Account</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ImageUploder')}>
-                    <Text style={styles.buttonText}>Upload Image</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -113,6 +142,15 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         alignSelf: 'center',
         marginBottom: 20,
+    },
+    profilePicPlaceholder: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#e1e4e8',
+    },
+    placeholderText: {
+        color: '#000',
+        fontSize: 16,
     },
     title: {
         fontSize: 24,

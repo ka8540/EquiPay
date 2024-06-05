@@ -96,3 +96,36 @@ def update_user_image_url(user_id, url):
     except Exception as e:
         print(f"Database Error: {e}")
         return "Failed to update image URL"
+
+def profile_picture(username):
+    print("Inside the profile picture def")
+    query = '''SELECT profile_pic FROM "user" WHERE username = %s;'''
+    # Ensure parameters are passed as a tuple, `(username,)` ensures it's a tuple even with one item
+    result = exec_get_all(query, (username,))
+    print("Result:", result)
+    if result:
+        # Assuming `result` is the full row, extract the profile_pic URL
+        return result[0]  # Modify based on how your data is structured
+    else:
+        return None
+
+def delete_account(username):
+    print("Attempting to delete account for username:", username)
+    # Check if user exists
+    user_exists = exec_get_all('SELECT 1 FROM "user" WHERE username = %s', (username,))
+    if not user_exists:
+        print("No account found for username:", username)
+        return False
+    
+    # Attempt to delete user
+    exec_commit('DELETE FROM "user" WHERE username = %s', (username,))
+    # Verify deletion
+    user_still_exists = exec_get_all('SELECT 1 FROM "user" WHERE username = %s', (username,))
+    if not user_still_exists:
+        print("Account successfully deleted for username:", username)
+        return True
+    else:
+        print("Failed to delete account for username:", username)
+        return False
+    
+    

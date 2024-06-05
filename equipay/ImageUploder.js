@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Button, Image, View, StyleSheet, Alert, Text } from 'react-native';
+import { Button, Image, View, StyleSheet, Alert, Text ,TouchableOpacity} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const ImageUploader = () => {
+const ImageUploader = ({navigation}) => {
     const [imageUri, setImageUri] = useState(null);
 
     const pickImageAndUpload = async () => {
@@ -69,13 +69,16 @@ const ImageUploader = () => {
 
     return (
         <View style={styles.container}>
-            <Button title="Pick an Image" onPress={pickImageAndUpload} />
+            <Button title="Upload an Image" onPress={pickImageAndUpload} />
             {imageUri && (
                 <View style={styles.imageContainer}>
                     <Image source={{ uri: imageUri }} style={styles.image} />
                     <Text style={styles.imageText}>Image Preview</Text>
                 </View>
             )}
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ViewProfile')}>
+                    <Text style={styles.buttonText}>Go Back</Text>
+            </TouchableOpacity>
         </View>
     );
 };
@@ -101,6 +104,17 @@ const styles = StyleSheet.create({
     imageText: {
         marginTop: 10,
         fontSize: 16,
+    },
+    button: {
+        marginTop: 20,
+        backgroundColor: '#007AFF',
+        padding: 10,
+        borderRadius: 5,
+    },
+    buttonText: {
+        color: 'white',
+        fontSize: 18,
+        textAlign: 'center',
     }
 });
 

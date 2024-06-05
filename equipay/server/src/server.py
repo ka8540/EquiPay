@@ -13,6 +13,7 @@ try:
     from api.account_api import AccountApi
     from api.password_api import PasswordApi
     from api.profile_pic_api import UploadAPI
+    from api.additional_settings_api import DeleteAccountApi
 except ImportError:
     from utilities.swen_344_db_utils import exec_sql_file
     from api.login_api import LoginAPI
@@ -22,6 +23,7 @@ except ImportError:
     from api.account_api import AccountApi
     from api.password_api import PasswordApi
     from api.profile_pic_api import UploadAPI
+    from api.additional_settings_api import DeleteAccountApi
     
 
 app = Flask(__name__)
@@ -40,6 +42,7 @@ api.add_resource(ListUsersApi, '/listUsers', resource_class_kwargs={'bcrypt': bc
 api.add_resource(AccountApi, '/accountapi', resource_class_kwargs={'bcrypt': bcrypt})
 api.add_resource(PasswordApi, '/passwordapi', resource_class_kwargs={'bcrypt': bcrypt})
 api.add_resource(UploadAPI, '/upload', resource_class_kwargs={'s3_bucket': app.config['S3_BUCKET_NAME']})
+api.add_resource(DeleteAccountApi, '/deleteaccount',resource_class_kwargs={'bcrypt': bcrypt})
 
 def setup_database():
     print("Loading db")
