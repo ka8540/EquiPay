@@ -22,7 +22,8 @@ CREATE TABLE "user" (
     username VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    session_key VARCHAR(255) UNIQUE
+    session_key VARCHAR(255) UNIQUE,
+    profile_pic VARCHAR(255)
 );
 
 -- Expenses Table
@@ -56,14 +57,14 @@ CREATE TABLE ExpenseParticipants (
     PRIMARY KEY (ExpenseID, PersonID)
 );
 
-INSERT INTO "user" (firstname, lastname, username, password, email, session_key) VALUES ('Rahul', 'Sharma', 'rahul.sharma', 'Qwerty123!', 'rahul.sharma@example.com', NULL);
-INSERT INTO "user" (firstname, lastname, username, password, email, session_key) VALUES ('Anjali', 'Verma', 'anjali.verma', 'Password123!', 'anjali.verma@example.com', NULL);
-INSERT INTO "user" (firstname, lastname, username, password, email, session_key) VALUES ('Vikram', 'Singh', 'vikram.singh', 'SecurePass!1', 'vikram.singh@example.com', NULL);
-INSERT INTO "user" (firstname, lastname, username, password, email, session_key) VALUES ('Priya', 'Nair', 'priya.nair', 'MyPass123!', 'priya.nair@example.com', NULL);
-INSERT INTO "user" (firstname, lastname, username, password, email, session_key) VALUES ('Amit', 'Patel', 'amit.patel', 'PassWord!123', 'amit.patel@example.com', NULL);
-INSERT INTO "user" (firstname, lastname, username, password, email, session_key) VALUES ('Sneha', 'Kumar', 'sneha.kumar', 'SuperPass!1', 'sneha.kumar@example.com', NULL);
-INSERT INTO "user" (firstname, lastname, username, password, email, session_key) VALUES ('Rohan', 'Mehta', 'rohan.mehta', 'UltraPass!123', 'rohan.mehta@example.com', NULL);
-INSERT INTO "user" (firstname, lastname, username, password, email, session_key) VALUES ('Kavita', 'Desai', 'kavita.desai', 'MegaPass!1', 'kavita.desai@example.com', NULL);
-INSERT INTO "user" (firstname, lastname, username, password, email, session_key) VALUES ('Arjun', 'Joshi', 'arjun.joshi', 'TopPass!123', 'arjun.joshi@example.com', NULL);
-INSERT INTO "user" (firstname, lastname, username, password, email, session_key) VALUES ('Nidhi', 'Rao', 'nidhi.rao', 'BestPass!1', 'nidhi.rao@example.com', NULL);
-
+INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Rahul', 'Sharma', 'rahul.sharma', 'Qwerty123!', 'rahul.sharma@example.com', NULL ,NULL);
+INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Anjali', 'Verma', 'anjali.verma', 'Password123!', 'anjali.verma@example.com', NULL ,NULL);
+INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Vikram', 'Singh', 'vikram.singh', 'SecurePass!1', 'vikram.singh@example.com', NULL ,NULL);
+INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Priya', 'Nair', 'priya.nair', 'MyPass123!', 'priya.nair@example.com', NULL ,NULL);
+INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Amit', 'Patel', 'amit.patel', 'PassWord!123', 'amit.patel@example.com', NULL ,NULL);
+INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Sneha', 'Kumar', 'sneha.kumar', 'SuperPass!1', 'sneha.kumar@example.com', NULL ,NULL);
+INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Rohan', 'Mehta', 'rohan.mehta', 'UltraPass!123', 'rohan.mehta@example.com', NULL ,NULL);
+INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Kavita', 'Desai', 'kavita.desai', 'MegaPass!1', 'kavita.desai@example.com', NULL ,NULL);
+INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Arjun', 'Joshi', 'arjun.joshi', 'TopPass!123', 'arjun.joshi@example.com', NULL ,NULL);
+INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Nidhi', 'Rao', 'nidhi.rao', 'BestPass!1', 'nidhi.rao@example.com', NULL ,NULL);
+INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('12', '12', '12', '$2b$12$YAHoV9QGxM8T/.ArdKjLTeG/5o/MLkVig.6FHXUmILpbYO2tJO8tK', '12@12', NULL ,NULL);

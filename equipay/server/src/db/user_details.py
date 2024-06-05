@@ -86,3 +86,13 @@ def get_password(username, old_password):
 def update_passord(hashed_password,username):
     query = '''UPDATE "user" SET password = %s WHERE username = %s'''
     result = exec_commit(query,(hashed_password,username))
+
+
+def update_user_image_url(user_id, url):
+    query = '''UPDATE "user" SET profile_pic = %s WHERE username = %s;'''
+    try:
+        exec_commit(query, (url, user_id))
+        return "Image URL updated successfully"
+    except Exception as e:
+        print(f"Database Error: {e}")
+        return "Failed to update image URL"

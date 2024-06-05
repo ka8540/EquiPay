@@ -115,6 +115,9 @@ const EditProfile = ({ navigation }) => {
                     <Text style={styles.buttonText}>Submit Changes</Text>
                 </TouchableOpacity>
             )}
+            <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
+                    <Text style={styles.buttonText}>Back to Account</Text>
+            </TouchableOpacity>
         </View>
     );
 };

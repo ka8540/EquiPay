@@ -16,6 +16,7 @@ import ViewProfile from './ViewProfile';
 import ChangePassword from './ChangePassword';
 import AdvancedFeatures from './AdvancedFeatures'; // Assuming you have this component
 import EditProfile from './EditProfile'; // Assuming you have this component
+import ImageUploader from './ImageUploder';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -74,6 +75,7 @@ export default function App() {
           <Stack.Screen name="ChangePassword" component={ChangePassword} />
           <Stack.Screen name="AdvancedFeatures" component={AdvancedFeatures} />
           <Stack.Screen name="EditProfile" component={EditProfile} />
+          <Stack.Screen name ="ImageUploder" component={ImageUploader} />
         </Stack.Navigator>
       </NavigationContainer>
     </View>

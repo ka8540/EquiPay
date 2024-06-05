@@ -12,6 +12,7 @@ try:
     from api.userlist_api import ListUsersApi
     from api.account_api import AccountApi
     from api.password_api import PasswordApi
+    from api.profile_pic_api import UploadAPI
 except ImportError:
     from utilities.swen_344_db_utils import exec_sql_file
     from api.login_api import LoginAPI
@@ -20,12 +21,15 @@ except ImportError:
     from api.userlist_api import ListUsersApi
     from api.account_api import AccountApi
     from api.password_api import PasswordApi
+    from api.profile_pic_api import UploadAPI
+    
 
 app = Flask(__name__)
 CORS(app)
 bcrypt = Bcrypt(app)
 app.config['SECRET_KEY'] = 'your_secret_key'
 app.config['JWT_SECRET_KEY'] = 'your_jwt_secret_key'
+app.config['S3_BUCKET_NAME'] = 'profile-picture-docs'
 jwt = JWTManager(app)
 api = Api(app)
 
@@ -35,6 +39,7 @@ api.add_resource(LogoutAPI, '/logout')
 api.add_resource(ListUsersApi, '/listUsers', resource_class_kwargs={'bcrypt': bcrypt})
 api.add_resource(AccountApi, '/accountapi', resource_class_kwargs={'bcrypt': bcrypt})
 api.add_resource(PasswordApi, '/passwordapi', resource_class_kwargs={'bcrypt': bcrypt})
+api.add_resource(UploadAPI, '/upload', resource_class_kwargs={'s3_bucket': app.config['S3_BUCKET_NAME']})
 
 def setup_database():
     print("Loading db")

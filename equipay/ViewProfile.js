@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MaterialIcons } from '@expo/vector-icons'; // Make sure to install expo icons
+import { MaterialIcons } from '@expo/vector-icons';
 
 const ViewProfile = ({ navigation }) => {
     const [isLoading, setIsLoading] = useState(true);
@@ -61,7 +61,6 @@ const ViewProfile = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <View style={styles.card}>
-                
                 <Text style={styles.title}>User Profile</Text>
                 <View style={styles.detailRow}>
                     <MaterialIcons name="person-outline" size={24} color="black" />
@@ -77,6 +76,9 @@ const ViewProfile = ({ navigation }) => {
                 </View>
                 <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
                     <Text style={styles.buttonText}>Back to Account</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ImageUploder')}>
+                    <Text style={styles.buttonText}>Upload Image</Text>
                 </TouchableOpacity>
             </View>
         </View>
