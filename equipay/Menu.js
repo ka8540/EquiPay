@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Button, FlatList, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Button, FlatList, Text, TouchableOpacity, StyleSheet, Alert, RefreshControl } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -7,43 +7,50 @@ const Menu = ({ navigation }) => {
   const [users, setUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const sessionKey = await AsyncStorage.getItem('sessionKey');
-        const token = await AsyncStorage.getItem('jwt_token');
-
-        if (!sessionKey || !token) {
-          Alert.alert('Error', 'Missing session key or token');
-          setLoading(false);
-          return;
-        }
-
-        const response = await axios.get('http://127.0.0.1:5000/listUsers', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Session-Key': sessionKey,
-          },
-        });
-
-        const transformedData = response.data.map(user => ({
-          id: user[0],
-          name: user[1],
-          email: user[3],
-        }));
-
-        setUsers(transformedData);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-        Alert.alert('Error', 'Failed to fetch users');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUsers();
   }, []);
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const sessionKey = await AsyncStorage.getItem('sessionKey');
+      const token = await AsyncStorage.getItem('jwt_token');
+
+      if (!sessionKey || !token) {
+        Alert.alert('Error', 'Missing session key or token');
+        setLoading(false);
+        return;
+      }
+
+      const response = await axios.get('http://127.0.0.1:5000/friends', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Session-Key': sessionKey,
+        },
+      });
+
+      const transformedData = response.data.map(user => ({
+        id: user[0].toString(), // Ensure id is a string for keyExtractor
+        name: user[1], // Assuming the second element is the name
+      }));
+
+      setUsers(transformedData);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      Alert.alert('Error', 'Failed to fetch users');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchUsers();
+  };
 
   const handleSelectUser = (userId) => {
     setSelectedUserId(userId);
@@ -58,9 +65,7 @@ const Menu = ({ navigation }) => {
       ]}
       onPress={() => handleSelectUser(item.id)}
     >
-      <View style={styles.cellContainer}>
-        <Text style={styles.cell}>{item.email}</Text>
-      </View>
+      <Text style={styles.cell}>{item.name}</Text>
       <Text style={styles.radioText}>{item.id === selectedUserId ? '🔘' : '⚪️'}</Text>
     </TouchableOpacity>
   );
@@ -75,6 +80,12 @@ const Menu = ({ navigation }) => {
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderItem}
           contentContainerStyle={styles.listContainer}
+          RefreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+            />
+          }
         />
       )}
     </View>
@@ -98,11 +109,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderBottomWidth: 1,
     borderColor: '#ccc',
-  },
-  cellContainer: {
-    flexDirection: 'row',
-    flex: 1,
-    paddingLeft: 20,
   },
   cell: {
     fontSize: 16,
