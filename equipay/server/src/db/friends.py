@@ -66,7 +66,7 @@ def update_friend_request_status(username, friend_id, action):
             user_id = user_id[0]
             print("action:",action)
             status = 'accepted' if action == 'accept' else 'rejected'
-            exec_commit("UPDATE Friends SET Status = %s WHERE FriendUserID = %s", (status,user_id))
+            exec_commit("UPDATE Friends SET Status = %s WHERE FriendUserID = %s AND UserID = %s", (status,user_id,friend_id))
             return True
         return False
     except Exception as e:

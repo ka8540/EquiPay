@@ -72,15 +72,19 @@ const AddFriends = ({ navigation }) => {
           'Session-Key': sessionKey,
         },
       });
+      console.log("Response:",response);
       if (response.status === 200) {
         Alert.alert("Success", `Friend request ${action}ed successfully!`);
-        fetchData(); // Refresh data after updating a friend request
+        // Directly update the state without re-fetching to test isolated update logic
+        setPendingRequests(prevRequests => 
+          prevRequests.filter(req => req.id !== friendId)
+        );
       }
     } catch (error) {
       Alert.alert('Error', `Failed to update friend request: ${error.response ? error.response.data.message : error.message}`);
     }
   };
-
+  
   const renderItem = ({ item }) => (
     <TouchableOpacity style={styles.item} onPress={() => handleAddFriend(item)}>
       <Text style={styles.title}>{item.name}</Text>
