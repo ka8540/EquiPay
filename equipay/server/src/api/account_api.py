@@ -44,10 +44,7 @@ class AccountApi(Resource):
             return make_response(jsonify({"message": "Invalid session key"}), 401)
 
         args = self.req_parser.parse_args()
-        # Remove username from kwargs if it's mistakenly passed to prevent double entry
         args.pop('username', None)
-
-        # Assuming all args are meant for updating the user details
         update_result = update_user_detail(username, **args)
         if update_result:
             return jsonify({"message": "User details updated successfully"})

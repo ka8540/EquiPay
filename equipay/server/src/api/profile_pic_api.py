@@ -32,16 +32,10 @@ class UploadAPI(Resource):
 
     @jwt_required()  
     def post(self):
-        print("Headers:", request.headers)  
-        print("Files:", request.files)  
-        # JWT identity and session key from headers
         jwt_user = get_jwt_identity()
         session_key = request.headers.get('Session-Key')
-        print("session-key inside the post request:",session_key)
         if not session_key:
             return make_response(jsonify({"error": "Session key is required"}), 400)
-
-        # Validate session key and get username
         username = get_username(session_key)
         if not username:
             return make_response(jsonify({"error": "Invalid session key or token mismatch"}), 401)
@@ -50,7 +44,6 @@ class UploadAPI(Resource):
         parser.add_argument('file', type=werkzeug.datastructures.FileStorage, location='files', required=True, help="File is required")
         args = parser.parse_args()
         file = args['file']
-        print(file)
 
         if file:
             file_name = file.filename

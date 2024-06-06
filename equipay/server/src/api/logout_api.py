@@ -17,17 +17,11 @@ class LogoutAPI(Resource):
     
     @jwt_required()
     def post(self):
-        print("Raw Request Data:", request.data)
         parser = reqparse.RequestParser()
         parser.add_argument('session_key', type=str, required=True, location='json')
         args = parser.parse_args()
-        print(args, 'session_key on api')
-
-        # Get current user's identity from the JWT token
         current_user = get_jwt_identity()
         print(f'Current user: {current_user}')
-
-        # Check user credentials
         response, status_code = user_logout(args)
 
         return make_response(jsonify(response), status_code)

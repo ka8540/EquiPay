@@ -18,26 +18,20 @@ class DeleteAccountApi(Resource):
 
     @jwt_required()
     def post(self):
-        print("Reached DeleteAccount POST endpoint")
-        # Adjust to handle different variations of session_key header
         session_key = request.headers.get('session_key') or request.headers.get('Session-Key')
         if not session_key:
             return make_response(jsonify({"message": "Missing session key"}), 400)
-
-        print("Session Key:", session_key)
-
-        # Verify session key
         username = get_username(session_key)
         if not username:
             return make_response(jsonify({"message": "Invalid session key"}), 401)
-        
-        print("Username associated with session key:", username)
-
         result = delete_account(username)
-
         if not result:
             return make_response(jsonify({"message": "Failed to Delete Account"}), 404)
         
         return make_response(jsonify({"message":"Account is Deleted Successfully "}),200)
+    
+
+
+    
 
         

@@ -15,26 +15,12 @@ class ListUsersApi(Resource):
 
     @jwt_required()
     def get(self):
-        print("Reached ListUsersApi GET endpoint")
-        
-        # Log all incoming headers for debugging
-        print("Headers received:", request.headers)
-
-        # Adjust to handle different variations of session_key header
         session_key = request.headers.get('session_key') or request.headers.get('Session-Key')
         if not session_key:
             return make_response(jsonify({"message": "Missing session key"}), 400)
-
-        print("Session Key:", session_key)
-
-        # Verify session key
         username = get_username(session_key)
         if not username:
             return make_response(jsonify({"message": "Invalid session key"}), 401)
-        
-        print("Username associated with session key:", username)
-
-        # Get user identity from JWT
         current_user = get_jwt_identity()
 
         # If session key is valid, return the list of users excluding the current user
