@@ -14,6 +14,7 @@ try:
     from api.password_api import PasswordApi
     from api.profile_pic_api import UploadAPI
     from api.additional_settings_api import DeleteAccountApi
+    from api.addfriend_api import AddFriendApi
 except ImportError:
     from utilities.swen_344_db_utils import exec_sql_file
     from api.login_api import LoginAPI
@@ -24,7 +25,7 @@ except ImportError:
     from api.password_api import PasswordApi
     from api.profile_pic_api import UploadAPI
     from api.additional_settings_api import DeleteAccountApi
-    
+    from api.addfriend_api import AddFriendApi
 
 app = Flask(__name__)
 CORS(app)
@@ -43,6 +44,7 @@ api.add_resource(AccountApi, '/accountapi', resource_class_kwargs={'bcrypt': bcr
 api.add_resource(PasswordApi, '/passwordapi', resource_class_kwargs={'bcrypt': bcrypt})
 api.add_resource(UploadAPI, '/upload', resource_class_kwargs={'s3_bucket': app.config['S3_BUCKET_NAME']})
 api.add_resource(DeleteAccountApi, '/deleteaccount',resource_class_kwargs={'bcrypt': bcrypt})
+api.add_resource(AddFriendApi, '/addFriend')
 
 def setup_database():
     print("Loading db")

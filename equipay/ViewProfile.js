@@ -103,7 +103,7 @@ const ViewProfile = ({ navigation }) => {
                     <MaterialIcons name="face" size={24} color="black" />
                     <Text style={styles.detail}>Last Name: {userData.lastname}</Text>
                 </View>
-                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ImageUploder')}>
+                <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ImageUploader')}>
                     <Text style={styles.buttonText}>Update Profile Picture</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>

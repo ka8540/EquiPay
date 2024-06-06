@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View , StyleSheet} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -14,12 +14,31 @@ import Group from './Group';
 import Activity from './Activity.Js';
 import ViewProfile from './ViewProfile';
 import ChangePassword from './ChangePassword';
-import AdvancedFeatures from './AdvancedFeatures'; // Assuming you have this component
-import EditProfile from './EditProfile'; // Assuming you have this component
+import AdvancedFeatures from './AdvancedFeatures';
+import EditProfile from './EditProfile';
 import ImageUploader from './ImageUploder';
+import AddFriends from './AddFriends';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
+function HomeStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen 
+        name="Cancel" 
+        component={Home} 
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen 
+        name="AddFriends" 
+        component={AddFriends}
+        options={{ headerShown: true }}
+      />
+    </Stack.Navigator>
+  );
+}
+
 
 function MenuStack() {
   return (
@@ -34,12 +53,17 @@ function MainAppTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
+        headerShown: false, // This will hide the header globally in the tab navigator
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
+          let iconSize = size;
+          let iconStyle = {};
           if (route.name === 'Home') {
             iconName = focused ? 'home' : 'home-outline';
-          } else if (route.name === 'MenuStack') {
-            iconName = focused ? 'menu' : 'menu-outline';
+          } else if (route.name === 'Add') {
+            iconName = 'add';
+            iconSize = focused ? size + 15 : size + 15;
+            iconStyle = focused ? {} : { marginTop: -2 };
           } else if (route.name === 'Account') {
             iconName = focused ? 'person' : 'person-outline';
           } else if (route.name === 'Group') {
@@ -47,16 +71,16 @@ function MainAppTabs() {
           } else if (route.name === 'Activity') {
             iconName = focused ? 'stats-chart' : 'stats-chart-outline';
           }
-          return <Ionicons name={iconName} size={size} color={color} />;
+          return <Ionicons name={iconName} size={iconSize} color={color} style={iconStyle} />;
         },
         tabBarActiveTintColor: 'black',
         tabBarInactiveTintColor: 'gray',
         tabBarStyle: { backgroundColor: '#D1FFFF' },
       })}
     >
-      <Tab.Screen name="Home" component={Home} />
+      <Tab.Screen name="Home" component={HomeStack} />
       <Tab.Screen name="Group" component={Group} />
-      <Tab.Screen name="MenuStack" component={MenuStack} options={{ title: 'Menu' }} />
+      <Tab.Screen name="Add" component={MenuStack} />
       <Tab.Screen name="Activity" component={Activity} />
       <Tab.Screen name="Account" component={Account} />
     </Tab.Navigator>
@@ -75,7 +99,7 @@ export default function App() {
           <Stack.Screen name="ChangePassword" component={ChangePassword} />
           <Stack.Screen name="AdvancedFeatures" component={AdvancedFeatures} />
           <Stack.Screen name="EditProfile" component={EditProfile} />
-          <Stack.Screen name ="ImageUploder" component={ImageUploader} />
+          <Stack.Screen name="ImageUploader" component={ImageUploader} />
         </Stack.Navigator>
       </NavigationContainer>
     </View>

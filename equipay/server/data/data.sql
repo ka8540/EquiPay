@@ -1,12 +1,13 @@
--- Drop tables if they exist
+-- Drop existing tables
 DROP TABLE IF EXISTS "user" CASCADE;
 DROP TABLE IF EXISTS Expenses CASCADE;
 DROP TABLE IF EXISTS Individuals CASCADE;
 DROP TABLE IF EXISTS Groups CASCADE;
 DROP TABLE IF EXISTS GroupMembers CASCADE;
 DROP TABLE IF EXISTS ExpenseParticipants CASCADE;
+DROP TABLE IF EXISTS Friends CASCADE;
 
--- Groups Table
+-- Create Groups Table
 CREATE TABLE Groups (
     GroupID SERIAL PRIMARY KEY,
     Name VARCHAR(255) NOT NULL,
@@ -14,7 +15,7 @@ CREATE TABLE Groups (
     Picture BYTEA
 );
 
--- Users Table
+-- Create Users Table
 CREATE TABLE "user" (
     user_id SERIAL PRIMARY KEY,
     firstname VARCHAR(255) NOT NULL,
@@ -26,7 +27,7 @@ CREATE TABLE "user" (
     profile_pic VARCHAR(255)
 );
 
--- Expenses Table
+-- Create Expenses Table
 CREATE TABLE Expenses (
     ExpenseID SERIAL PRIMARY KEY,
     Date TIMESTAMP NOT NULL,
@@ -36,20 +37,20 @@ CREATE TABLE Expenses (
     GroupID INT REFERENCES Groups(GroupID)
 );
 
--- Individuals Table
+-- Create Individuals Table
 CREATE TABLE Individuals (
     PersonID SERIAL PRIMARY KEY,
     PersonName VARCHAR(255) NOT NULL
 );
 
--- Group Members Table
+-- Create Group Members Table
 CREATE TABLE GroupMembers (
     GroupID INT REFERENCES Groups(GroupID),
     PersonID INT REFERENCES Individuals(PersonID),
     PRIMARY KEY (GroupID, PersonID)
 );
 
--- Expense Participants Table
+-- Create Expense Participants Table
 CREATE TABLE ExpenseParticipants (
     ExpenseID INT REFERENCES Expenses(ExpenseID),
     PersonID INT REFERENCES Individuals(PersonID),
@@ -57,7 +58,16 @@ CREATE TABLE ExpenseParticipants (
     PRIMARY KEY (ExpenseID, PersonID)
 );
 
-INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Rahul', 'Sharma', 'rahul.sharma', 'Qwerty123!', 'rahul.sharma@example.com', NULL ,NULL);
+-- Create Friends Table
+CREATE TABLE Friends (
+    FriendID SERIAL PRIMARY KEY,
+    UserID INT REFERENCES "user"(user_id) ON DELETE CASCADE,
+    FriendUserID INT REFERENCES "user"(user_id) ON DELETE CASCADE,
+    Status VARCHAR(50) NOT NULL DEFAULT 'pending', -- 'pending', 'accepted', 'rejected'
+    LastUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Rahul', 'Sharma', 'rahul', '$2b$12$YAHoV9QGxM8T/.ArdKjLTeG/5o/MLkVig.6FHXUmILpbYO2tJO8tK', 'rahul.sharma@example.com', NULL ,NULL);
 INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Anjali', 'Verma', 'anjali.verma', 'Password123!', 'anjali.verma@example.com', NULL ,NULL);
 INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Vikram', 'Singh', 'vikram.singh', 'SecurePass!1', 'vikram.singh@example.com', NULL ,NULL);
 INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Priya', 'Nair', 'priya.nair', 'MyPass123!', 'priya.nair@example.com', NULL ,NULL);
