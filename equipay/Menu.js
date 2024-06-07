@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Menu = ({ navigation }) => {
   const [users, setUsers] = useState([]);
-  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [selectedUserIds, setSelectedUserIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -18,7 +18,6 @@ const Menu = ({ navigation }) => {
     try {
       const sessionKey = await AsyncStorage.getItem('sessionKey');
       const token = await AsyncStorage.getItem('jwt_token');
-
       if (!sessionKey || !token) {
         Alert.alert('Error', 'Missing session key or token');
         setLoading(false);
@@ -53,20 +52,37 @@ const Menu = ({ navigation }) => {
   };
 
   const handleSelectUser = (userId) => {
-    setSelectedUserId(userId);
-    navigation.navigate('AddItem', { userId });
+    const isSelected = selectedUserIds.includes(userId);
+    if (isSelected) {
+      setSelectedUserIds(currentIds => currentIds.filter(id => id !== userId));
+    } else {
+      if (selectedUserIds.length < 4) {
+        setSelectedUserIds(currentIds => [...currentIds, userId]);
+      } else {
+        Alert.alert("Limit reached", "You can select up to 4 friends.");
+      }
+      console.log("selected ids:",selectedUserIds)
+    }
+  };
+
+  const navigateToAddItem = () => {
+    if (selectedUserIds.length === 0) {
+      Alert.alert("Select Friends", "Please select at least one friend to split the expense.");
+      return;
+    }
+    navigation.navigate('AddItem', { userIds: selectedUserIds });
   };
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={[
         styles.row,
-        { backgroundColor: item.id === selectedUserId ? '#d0ebff' : '#fff' }
+        { backgroundColor: selectedUserIds.includes(item.id) ? '#d0ebff' : '#fff' }
       ]}
       onPress={() => handleSelectUser(item.id)}
     >
       <Text style={styles.cell}>{item.name}</Text>
-      <Text style={styles.radioText}>{item.id === selectedUserId ? '🔘' : '⚪️'}</Text>
+      <Text style={styles.radioText}>{selectedUserIds.includes(item.id) ? '🔘' : '⚪️'}</Text>
     </TouchableOpacity>
   );
 
@@ -75,18 +91,21 @@ const Menu = ({ navigation }) => {
       {loading ? (
         <Text>Loading...</Text>
       ) : (
-        <FlatList
-          data={users}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={renderItem}
-          contentContainerStyle={styles.listContainer}
-          RefreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-            />
-          }
-        />
+        <>
+          <FlatList
+            data={users}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={renderItem}
+            contentContainerStyle={styles.listContainer}
+            RefreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+              />
+            }
+          />
+          <Button title="Continue" onPress={navigateToAddItem} />
+        </>
       )}
     </View>
   );

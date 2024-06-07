@@ -16,6 +16,7 @@ try:
     from api.additional_settings_api import DeleteAccountApi
     from api.addfriend_api import AddFriendApi
     from api.addfriend_api import FiendList
+    from api.split_expense_api import SplitExpenseTwoApi
 except ImportError:
     from utilities.swen_344_db_utils import exec_sql_file
     from api.login_api import LoginAPI
@@ -28,6 +29,7 @@ except ImportError:
     from api.additional_settings_api import DeleteAccountApi
     from api.addfriend_api import AddFriendApi
     from api.addfriend_api import FiendList
+    from api.split_expense_api import SplitExpenseTwoApi
 
 app = Flask(__name__)
 CORS(app)
@@ -48,6 +50,7 @@ api.add_resource(UploadAPI, '/upload', resource_class_kwargs={'s3_bucket': app.c
 api.add_resource(DeleteAccountApi, '/deleteaccount',resource_class_kwargs={'bcrypt': bcrypt})
 api.add_resource(AddFriendApi, '/addFriend')
 api.add_resource(FiendList,'/friends')
+api.add_resource(SplitExpenseTwoApi, '/split-expense')
 
 def setup_database():
     print("Loading db")

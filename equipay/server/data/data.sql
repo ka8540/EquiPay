@@ -1,19 +1,10 @@
 -- Drop existing tables
 DROP TABLE IF EXISTS "user" CASCADE;
 DROP TABLE IF EXISTS Expenses CASCADE;
-DROP TABLE IF EXISTS Individuals CASCADE;
-DROP TABLE IF EXISTS Groups CASCADE;
-DROP TABLE IF EXISTS GroupMembers CASCADE;
-DROP TABLE IF EXISTS ExpenseParticipants CASCADE;
+DROP TABLE IF EXISTS Debts CASCADE;
 DROP TABLE IF EXISTS Friends CASCADE;
 
--- Create Groups Table
-CREATE TABLE Groups (
-    GroupID SERIAL PRIMARY KEY,
-    Name VARCHAR(255) NOT NULL,
-    Type VARCHAR(255),
-    Picture BYTEA
-);
+
 
 -- Create Users Table
 CREATE TABLE "user" (
@@ -30,32 +21,19 @@ CREATE TABLE "user" (
 -- Create Expenses Table
 CREATE TABLE Expenses (
     ExpenseID SERIAL PRIMARY KEY,
-    Date TIMESTAMP NOT NULL,
-    Note VARCHAR(255),
-    Price DECIMAL(10, 2) NOT NULL,
+    PayerID INT REFERENCES "user"(user_id),
+    Amount DECIMAL(10, 2) NOT NULL,
     Description VARCHAR(255),
-    GroupID INT REFERENCES Groups(GroupID)
+    Date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create Individuals Table
-CREATE TABLE Individuals (
-    PersonID SERIAL PRIMARY KEY,
-    PersonName VARCHAR(255) NOT NULL
-);
-
--- Create Group Members Table
-CREATE TABLE GroupMembers (
-    GroupID INT REFERENCES Groups(GroupID),
-    PersonID INT REFERENCES Individuals(PersonID),
-    PRIMARY KEY (GroupID, PersonID)
-);
-
--- Create Expense Participants Table
-CREATE TABLE ExpenseParticipants (
+-- Create Debt Table to track who owes what to whom
+CREATE TABLE Debts (
+    DebtID SERIAL PRIMARY KEY,
     ExpenseID INT REFERENCES Expenses(ExpenseID),
-    PersonID INT REFERENCES Individuals(PersonID),
-    Amount DECIMAL(10, 2),
-    PRIMARY KEY (ExpenseID, PersonID)
+    OwedToUserID INT REFERENCES "user"(user_id),
+    OwedByUserID INT REFERENCES "user"(user_id),
+    AmountOwed DECIMAL(10, 2) NOT NULL
 );
 
 -- Create Friends Table
