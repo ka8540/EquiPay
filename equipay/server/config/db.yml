@@ -1,5 +1,5 @@
-host: localhost
+host: database-1.cnw8oyyigq6h.us-east-1.rds.amazonaws.com
 database: SWEN732
 user: SWEN732
-password: kl,.
+password: kush1234
 port: 5432

@@ -56,3 +56,8 @@ INSERT INTO "user" (firstname, lastname, username, password, email, session_key,
 INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Arjun', 'Joshi', 'arjun.joshi', 'TopPass!123', 'arjun.joshi@example.com', NULL ,NULL);
 INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Nidhi', 'Rao', 'nidhi.rao', 'BestPass!1', 'nidhi.rao@example.com', NULL ,NULL);
 INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('12', '12', '12', '$2b$12$YAHoV9QGxM8T/.ArdKjLTeG/5o/MLkVig.6FHXUmILpbYO2tJO8tK', '12@12', NULL ,NULL);
+
+
+INSERT INTO Friends (UserID, FriendUserID, Status) VALUES ('1', '11', 'accepted');
+INSERT INTO Friends (UserID, FriendUserID, Status) VALUES ('2', '11', 'accepted');
+INSERT INTO Friends (UserID, FriendUserID, Status) VALUES ('3', '11', 'accepted');

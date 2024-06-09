@@ -18,6 +18,7 @@ const Menu = ({ navigation }) => {
     try {
       const sessionKey = await AsyncStorage.getItem('sessionKey');
       const token = await AsyncStorage.getItem('jwt_token');
+      console.log('Token:',token);
       if (!sessionKey || !token) {
         Alert.alert('Error', 'Missing session key or token');
         setLoading(false);
