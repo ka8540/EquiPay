@@ -14,11 +14,11 @@ class DebtsByFriendAPI(Resource):
         user_id = get_user_id(jwt_user['username'])
 
         if not user_id:
-            return jsonify({"message": "User not found"}), 404
+            return make_response(jsonify({"message": "User not found"}), 404)
 
         debts = get_debts_by_friend(user_id, friend_id)
         if not debts:
-            return jsonify({"message": "No debts found"}), 404
+            return make_response(jsonify({"message": "No debts found"}), 201)
 
         return jsonify(debts)
     

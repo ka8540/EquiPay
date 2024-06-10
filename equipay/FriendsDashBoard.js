@@ -1,68 +1,100 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, Image, ActivityIndicator, TouchableOpacity, Alert, FlatList } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-const FriendsDashboard = ({ route }) => {
+const FriendsDashboard = ({ route, navigation }) => {
   const { friend_id } = route.params;
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({
     name: '',
     netAmount: 0,
-    profilePicUrl: null
+    profilePicUrl: null,
+    debts: []
   });
 
   useEffect(() => {
-    const fetchData = async () => {
-      const token = await AsyncStorage.getItem('jwt_token');
-      const sessionKey = await AsyncStorage.getItem('sessionKey');
-
-      if (!token || !sessionKey) {
-        Alert.alert("Error", "Authentication details are missing");
-        return;
-      }
-
-      try {
-        // Fetch the amount information
-        const amountUrl = `http://127.0.0.1:5000/total-amount/${friend_id}`;
-        const amountResponse = await axios.get(amountUrl, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Session-Key': sessionKey
-          }
-        });
-
-        // Fetch the profile picture
-        const profilePicUrl = `http://127.0.0.1:5000/friend-profile-picture/${friend_id}`;
-        const profilePicResponse = await axios.get(profilePicUrl, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Session-Key': sessionKey
-          }
-        });
-
-        if (amountResponse.data) {
-          setProfile({
-            name: amountResponse.data.friend_name, // Assuming the API returns friend_name
-            netAmount: amountResponse.data.net_amount, // Assuming the API returns net_amount
-            profilePicUrl: profilePicResponse.data.url || null // Assuming the API returns the URL or it's null if not available
-          });
-        } else {
-          Alert.alert("Error", "Failed to fetch profile data");
-        }
-      } catch (error) {
-        console.error("Error fetching profile data:", error);
-      }
-      setIsLoading(false);
-    };
-
     fetchData();
   }, []);
 
-  if (isLoading) {
-    return <View style={styles.container}><ActivityIndicator size="large" color="#0000ff" /></View>;
-  }
+  const fetchData = async () => {
+    const token = await AsyncStorage.getItem('jwt_token');
+    const sessionKey = await AsyncStorage.getItem('sessionKey');
 
+    if (!token || !sessionKey) {
+      Alert.alert("Error", "Authentication details are missing");
+      return;
+    }
+
+    try {
+      const amountUrl = `http://127.0.0.1:5000/total-amount/${friend_id}`;
+      const profilePicUrl = `http://127.0.0.1:5000/friend-profile-picture/${friend_id}`;
+      const debtsUrl = `http://127.0.0.1:5000/debts-by-friend/${friend_id}`;
+      const responses = await Promise.all([
+        axios.get(amountUrl, { headers: { Authorization: `Bearer ${token}`, 'Session-Key': sessionKey }}),
+        axios.get(profilePicUrl, { headers: { Authorization: `Bearer ${token}`, 'Session-Key': sessionKey }}),
+        axios.get(debtsUrl, { headers: { Authorization: `Bearer ${token}`, 'Session-Key': sessionKey }})
+      ]);
+
+      const amountResponse = responses[0];
+      const profilePicResponse = responses[1];
+      const debtsResponse = responses[2];
+      console.log("Debt Response:",responses[2]);
+      if (amountResponse.data && profilePicResponse.data && debtsResponse.data) {
+        setProfile({
+          name: amountResponse.data.friend_name,
+          netAmount: amountResponse.data.net_amount,
+          profilePicUrl: profilePicResponse.data.url || null,
+          debts: debtsResponse.data || []
+        });
+        console.log("Debts:",debtsResponse);
+      } else {
+        Alert.alert("Error", "Failed to fetch profile data");
+      }
+    } catch (error) {
+      console.error("Error fetching profile data:", error);
+    }
+    setIsLoading(false);
+  };
+
+  const handleDebtSettlement = async (debt) => {
+    const token = await AsyncStorage.getItem('jwt_token');
+    const sessionKey = await AsyncStorage.getItem('sessionKey');
+  
+    if (!token || !sessionKey) {
+      Alert.alert("Authentication Error", "Missing authentication details");
+      return;
+    }
+  
+    const postData = {
+      friend_id: friend_id,
+      amount_owed: parseFloat(debt.amount_owed) // Ensure this is a number if required
+    };
+  
+    console.log("Sending Post Data:", postData);
+  
+    try {
+      const response = await axios.post('http://127.0.0.1:5000/delete-debt', postData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Session-Key': sessionKey,
+          'Content-Type': 'application/json'
+        }
+      });
+  
+      if (response.status === 200) {
+        Alert.alert("Success", "Debt settled successfully");
+        fetchData();  // Refresh data
+      } else {
+        Alert.alert("Error", "Failed to settle debt: " + (response.data.error || "Unknown Error"));
+      }
+    } catch (error) {
+      console.error("API Call Failed", error);
+      Alert.alert("Error", "Failed to settle debt: " + error.message);
+    }
+  };
+  
+  
   return (
     <View style={styles.container}>
       <View style={styles.profileCard}>
@@ -77,6 +109,15 @@ const FriendsDashboard = ({ route }) => {
         <Text style={[styles.amount, { color: profile.netAmount < 0 ? 'red' : 'green' }]}>
           {profile.netAmount < 0 ? `You owe $${Math.abs(profile.netAmount)}` : `You are owed $${profile.netAmount}`}
         </Text>
+        <FlatList
+          data={profile.debts}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => handleDebtSettlement(item)} style={styles.debtItem}>
+              <Text>{item.description} - ${item.amount_owed}</Text>
+            </TouchableOpacity>
+          )}
+        />
       </View>
     </View>
   );
@@ -129,6 +170,12 @@ const styles = StyleSheet.create({
   amount: {
     fontSize: 18,
     textAlign: 'center',
+  },
+  debtItem: {
+    padding: 10,
+    marginTop: 10,
+    backgroundColor: '#ccc',
+    borderRadius: 5
   }
 });
 

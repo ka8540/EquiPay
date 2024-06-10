@@ -79,4 +79,4 @@ class FriendProfilePictureAPI(Resource):
         if image_url:
             return jsonify({"url": image_url})
         else:
-            return make_response(jsonify({"error": "Not friends or no image available"}), 404)
+            return make_response(jsonify({"error": "Not friends or no image available"}), 200)
