@@ -1,36 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, RefreshControl, ScrollView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
 export default function Home({ navigation }) {
   const [debts, setDebts] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    const fetchDebts = async () => {
-      try {
-        const token = await AsyncStorage.getItem('jwt_token');
-        const sessionKey = await AsyncStorage.getItem('sessionKey');
-        if (!token || !sessionKey) {
-          Alert.alert("Error", "Authentication details are missing");
-          return;
-        }
-        
-        const response = await axios.get('http://127.0.0.1:5000/total-amount', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Session-Key': sessionKey,
-          },
-        });
-        setDebts(response.data);
-      } catch (error) {
-        Alert.alert("Error", "Failed to fetch debts: " + error.message);
-      }
-    };
-
     fetchDebts();
   }, []);
+
+  const fetchDebts = async () => {
+    try {
+      const token = await AsyncStorage.getItem('jwt_token');
+      const sessionKey = await AsyncStorage.getItem('sessionKey');
+      if (!token || !sessionKey) {
+        Alert.alert("Error", "Authentication details are missing");
+        return;
+      }
+      
+      const response = await axios.get('http://127.0.0.1:5000/total-amount', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Session-Key': sessionKey,
+        },
+      });
+      setDebts(response.data);
+      setRefreshing(false);  // Reset refreshing state when data is loaded
+    } catch (error) {
+      Alert.alert("Error", "Failed to fetch debts: " + error.message);
+      setRefreshing(false);  // Reset refreshing state on error as well
+    }
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchDebts();
+  };
 
   const renderItem = ({ item }) => (
     <TouchableOpacity 
@@ -45,53 +53,56 @@ export default function Home({ navigation }) {
   );
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity 
-        style={styles.addFriendButton}
-        onPress={() => navigation.navigate('AddFriends')}
-      >
-        <MaterialIcons name="person-add" size={28} color="black" />
-      </TouchableOpacity>
-
-      <FlatList
-        data={debts}
-        renderItem={renderItem}
-        keyExtractor={item => item.friend_id.toString()}
-        contentContainerStyle={styles.listContainer}
-      />
-
-      <View style={styles.menu}>
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => navigation.navigate('Home')}
+    <FlatList
+      data={debts}
+      renderItem={renderItem}
+      keyExtractor={item => item.friend_id.toString()}
+      contentContainerStyle={[styles.listContainer, { backgroundColor: '#fff' }]} 
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+        />
+      }
+      ListHeaderComponent={(
+        <TouchableOpacity 
+          style={styles.addFriendButton}
+          onPress={() => navigation.navigate('AddFriends')}
         >
-          <Text style={styles.menuText}>Home</Text>
+          <MaterialIcons name="person-add" size={28} color="black" />
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.menuButton}
-          onPress={() => navigation.navigate('Account')}
-        >
-          <Text style={styles.menuText}>Account</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+      )}
+      ListFooterComponent={(
+        <View style={styles.menu}>
+          <TouchableOpacity
+            style={styles.menuButton}
+            onPress={() => navigation.navigate('Home')}
+          >
+            <Text style={styles.menuText}>Home</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.menuButton}
+            onPress={() => navigation.navigate('Account')}
+          >
+            <Text style={styles.menuText}>Account</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+    />
+  );  
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-  },
   listContainer: {
-    width: '100%',
-    marginTop:160,
-    marginLeft:30,
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 20,
   },
   menu: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 10,
   },
   menuButton: {
     padding: 15,
@@ -105,22 +116,22 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   addFriendButton: {
-    position: 'absolute',
-    right: 10,
-    top: 60,
+    position: 'absolute',  // Position the button absolutely
+    bottom: 280,               // Distance from the top of its container
+    left: 160,             // Distance from the right of its container
     backgroundColor: '#fff',
     padding: 10,
     borderRadius: 30,
     borderWidth: 1,
-    borderColor: '#fff'
-  },
+    borderColor: '#fff',
+  },  
   debtItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: 10,
     borderBottomWidth: 1,
     borderColor: '#ccc',
-    width: '90%',
+    width: '100%',
   },
   friendName: {
     fontSize: 16,

@@ -1,38 +1,41 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, Text, StyleSheet, TouchableOpacity, FlatList, Alert, Image, View } from 'react-native';
+import { SafeAreaView, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Image, RefreshControl, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Account = ({ navigation }) => {
     const [profileImageUrl, setProfileImageUrl] = useState(null);
+    const [refreshing, setRefreshing] = useState(false);
 
-    useEffect(() => {
-        const fetchProfileImage = async () => {
-            const sessionKey = await AsyncStorage.getItem('sessionKey');
-            const token = await AsyncStorage.getItem('jwt_token');
-            if (sessionKey && token) {
-                try {
-                    const response = await fetch('http://127.0.0.1:5000/upload', {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Session-Key': sessionKey
-                        }
-                    });
-                    const data = await response.json();
-                    console.log("Fetched image data:", data);
-                    // Check if the response is ok and data.url is not empty
-                    if (response.ok && data.url && data.url.length > 0) {
-                        setProfileImageUrl(data.url[0]); // Access the first element if it's an array
-                    } else {
-                        setProfileImageUrl(null);  // Use null for no image and handle the UI accordingly
+    const fetchProfileImage = async () => {
+        setRefreshing(true); // Set refreshing to true to show the refresh indicator
+        const sessionKey = await AsyncStorage.getItem('sessionKey');
+        const token = await AsyncStorage.getItem('jwt_token');
+        if (sessionKey && token) {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/upload', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Session-Key': sessionKey
                     }
-                } catch (error) {
-                    console.error('Error fetching profile image:', error);
+                });
+                const data = await response.json();
+                console.log("Fetched image data:", data);
+                if (response.ok && data.url && data.url.length > 0) {
+                    setProfileImageUrl(data.url[0]);
+                } else {
                     setProfileImageUrl(null);
                 }
+            } catch (error) {
+                console.error('Error fetching profile image:', error);
+                setProfileImageUrl(null);
             }
-        };
+        }
+        setRefreshing(false); // Reset refreshing state after fetching data
+    };
+
+    useEffect(() => {
         fetchProfileImage();
     }, []);
 
@@ -61,27 +64,31 @@ const Account = ({ navigation }) => {
         { id: '4', title: 'Edit Profile', icon: 'account-edit-outline', action: () => navigation.navigate('EditProfile') },
     ];
 
-    const renderItem = ({ item }) => (
-        <TouchableOpacity style={styles.item} onPress={item.action}>
-            <MaterialCommunityIcons name={item.icon} size={35} color="black" />
-            <Text style={styles.title}>{item.title}</Text>
-        </TouchableOpacity>
-    );
-
     return (
         <SafeAreaView style={styles.container}>
-            {profileImageUrl ? (
-                <Image source={{ uri: profileImageUrl }} style={styles.profilePic} />
-            ) : (
-                <View style={[styles.profilePic, styles.profilePicPlaceholder]}>
-                    <Text style={styles.placeholderText}>No Image Available</Text>
-                </View>
-            )}
-            <FlatList
-                data={menuItems}
-                renderItem={renderItem}
-                keyExtractor={item => item.id}
-            />
+            <ScrollView
+                contentContainerStyle={styles.scrollViewContent}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={fetchProfileImage}
+                    />
+                }
+            >
+                {profileImageUrl ? (
+                    <Image source={{ uri: profileImageUrl }} style={styles.profilePic} />
+                ) : (
+                    <View style={[styles.profilePic, styles.profilePicPlaceholder]}>
+                        <Text style={styles.placeholderText}>No Image Available</Text>
+                    </View>
+                )}
+                {menuItems.map(item => (
+                    <TouchableOpacity key={item.id} style={styles.item} onPress={item.action}>
+                        <MaterialCommunityIcons name={item.icon} size={40} color="black" />
+                        <Text style={styles.title}>{item.title}</Text>
+                    </TouchableOpacity>
+                ))}
+            </ScrollView>
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
                 <Text style={styles.logoutButtonText}>Log out</Text>
             </TouchableOpacity>
@@ -94,25 +101,34 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
     },
+    scrollViewContent: {
+        alignItems: 'flex-start', // Align children of ScrollView to the start
+        paddingTop: 20,
+    },
     item: {
         flexDirection: 'row',
-        padding: 22, 
-        marginVertical: 12, 
+        padding: 32,
+        width: '100%', // Take full width to align text and icon
         alignItems: 'center',
-        borderBottomWidth: 1,  
-        borderBottomColor: '#ccc', 
+        borderBottomWidth: 2,
+        borderBottomColor: '#ccc',
+        justifyContent: 'flex-start',
     },
     title: {
-        marginLeft: 20, 
-        fontSize: 22, 
-        fontWeight: 'bold', 
+        marginLeft: 20,
+        fontSize: 25,
+        fontWeight: 'bold',
     },
     logoutButton: {
+        position: 'absolute', // Position button at the bottom
+        bottom: 0,
+        left: 0,
+        right: 0,
         backgroundColor: 'navy',
         padding: 20,
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 20, 
+        width: '100%',
     },
     logoutButtonText: {
         fontSize: 20,
@@ -125,7 +141,6 @@ const styles = StyleSheet.create({
         borderRadius: 80,
         alignSelf: 'center',
         marginBottom: 20,
-        marginTop:20,
     },
     profilePicPlaceholder: {
         justifyContent: 'center',

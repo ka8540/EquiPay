@@ -109,6 +109,21 @@ def profile_picture(username):
     else:
         return None
 
+def check_friendship_and_get_profile_pic(user_id, friend_id):
+    query = '''
+    SELECT u.profile_pic 
+    FROM "user" u
+    JOIN Friends f ON (u.user_id = f.FriendUserID OR u.user_id = f.UserID)
+    WHERE ((f.UserID = %s AND f.FriendUserID = %s) OR (f.UserID = %s AND f.FriendUserID = %s))
+      AND f.Status = 'accepted';
+    '''
+    params = (user_id, friend_id, friend_id, user_id)
+    result = exec_get_all(query, params)
+    if result:
+        return result[0][0]  # Assuming the first column of the first row is the profile_pic URL.
+    else:
+        return None
+    
 def delete_account(username):
     print("Attempting to delete account for username:", username)
     # Check if user exists

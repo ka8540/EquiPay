@@ -12,7 +12,7 @@ try:
     from api.userlist_api import ListUsersApi
     from api.account_api import AccountApi
     from api.password_api import PasswordApi
-    from api.profile_pic_api import UploadAPI
+    from api.profile_pic_api import UploadAPI, FriendProfilePictureAPI
     from api.additional_settings_api import DeleteAccountApi
     from api.addfriend_api import AddFriendApi
     from api.addfriend_api import FiendList
@@ -26,7 +26,7 @@ except ImportError:
     from api.userlist_api import ListUsersApi
     from api.account_api import AccountApi
     from api.password_api import PasswordApi
-    from api.profile_pic_api import UploadAPI
+    from api.profile_pic_api import UploadAPI, FriendProfilePictureAPI
     from api.additional_settings_api import DeleteAccountApi
     from api.addfriend_api import AddFriendApi
     from api.addfriend_api import FiendList
@@ -55,6 +55,7 @@ api.add_resource(FiendList,'/friends')
 api.add_resource(SplitExpenseTwoApi, '/split-expense')
 api.add_resource(TotalAmountAPIbyID, '/total-amount/<int:friend_id>')
 api.add_resource(TotalAmountAPI, '/total-amount')
+api.add_resource(FriendProfilePictureAPI, '/friend-profile-picture/<int:friend_id>')
 
 def setup_database():
     print("Loading db")

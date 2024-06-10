@@ -23,6 +23,7 @@ const FriendsDashboard = ({ route }) => {
       }
 
       try {
+        // Fetch the amount information
         const amountUrl = `http://127.0.0.1:5000/total-amount/${friend_id}`;
         const amountResponse = await axios.get(amountUrl, {
           headers: {
@@ -31,11 +32,20 @@ const FriendsDashboard = ({ route }) => {
           }
         });
 
+        // Fetch the profile picture
+        const profilePicUrl = `http://127.0.0.1:5000/friend-profile-picture/${friend_id}`;
+        const profilePicResponse = await axios.get(profilePicUrl, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Session-Key': sessionKey
+          }
+        });
+
         if (amountResponse.data) {
           setProfile({
-            name: amountResponse.data.friend_name,
-            netAmount: amountResponse.data.net_amount,
-            profilePicUrl: amountResponse.data.profilePicUrl || null
+            name: amountResponse.data.friend_name, // Assuming the API returns friend_name
+            netAmount: amountResponse.data.net_amount, // Assuming the API returns net_amount
+            profilePicUrl: profilePicResponse.data.url || null // Assuming the API returns the URL or it's null if not available
           });
         } else {
           Alert.alert("Error", "Failed to fetch profile data");

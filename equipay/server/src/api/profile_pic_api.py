@@ -6,7 +6,8 @@ from botocore.exceptions import NoCredentialsError
 import werkzeug
 from utilities.swen_344_db_utils import exec_commit
 from model.user import get_username  
-from db.user_details import update_user_image_url , profile_picture
+from db.user_details import update_user_image_url , profile_picture, check_friendship_and_get_profile_pic
+from db.amoutowed import get_user_id
 
 class UploadAPI(Resource):
     def __init__(self, **kwargs):
@@ -64,3 +65,18 @@ class UploadAPI(Resource):
                 return make_response(jsonify({"error": str(e)}), 500)
         else:
             return make_response(jsonify({"error": "No file part"}), 400)
+        
+
+class FriendProfilePictureAPI(Resource):
+    @jwt_required()
+    def get(self, friend_id):  
+        jwt_user = get_jwt_identity()
+
+        username = jwt_user['username']
+        user_id = get_user_id(username) 
+
+        image_url = check_friendship_and_get_profile_pic(user_id, friend_id)
+        if image_url:
+            return jsonify({"url": image_url})
+        else:
+            return make_response(jsonify({"error": "Not friends or no image available"}), 404)
