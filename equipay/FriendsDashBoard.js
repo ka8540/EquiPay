@@ -6,8 +6,12 @@ import axios from 'axios';
 const FriendsDashboard = ({ route }) => {
   const { friend_id } = route.params;
   const [isLoading, setIsLoading] = useState(true);
-  const [profile, setProfile] = useState({});
-  
+  const [profile, setProfile] = useState({
+    name: '',
+    netAmount: 0,
+    profilePicUrl: null
+  });
+
   useEffect(() => {
     const fetchData = async () => {
       const token = await AsyncStorage.getItem('jwt_token');
@@ -19,23 +23,27 @@ const FriendsDashboard = ({ route }) => {
       }
 
       try {
-        const profileUrl = `http://127.0.0.1:5000/friend/${friend_id}`;
-        const response = await axios.get(profileUrl, {
+        const amountUrl = `http://127.0.0.1:5000/total-amount/${friend_id}`;
+        const amountResponse = await axios.get(amountUrl, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Session-Key': sessionKey
           }
         });
-        if (response.data) {
-          setProfile(response.data);
-          setIsLoading(false);
+
+        if (amountResponse.data) {
+          setProfile({
+            name: amountResponse.data.friend_name,
+            netAmount: amountResponse.data.net_amount,
+            profilePicUrl: amountResponse.data.profilePicUrl || null
+          });
         } else {
           Alert.alert("Error", "Failed to fetch profile data");
         }
       } catch (error) {
         console.error("Error fetching profile data:", error);
-        setIsLoading(false);
       }
+      setIsLoading(false);
     };
 
     fetchData();

@@ -14,7 +14,7 @@ export default function Home({ navigation }) {
         const sessionKey = await AsyncStorage.getItem('sessionKey');
         if (!token || !sessionKey) {
           Alert.alert("Error", "Authentication details are missing");
-          returzn;
+          return;
         }
         
         const response = await axios.get('http://127.0.0.1:5000/total-amount', {
@@ -33,12 +33,15 @@ export default function Home({ navigation }) {
   }, []);
 
   const renderItem = ({ item }) => (
-    <View style={styles.debtItem}>
+    <TouchableOpacity 
+      style={styles.debtItem}
+      onPress={() => navigation.navigate('FriendsDashBoard', { friend_id: item.friend_id })}
+    >
       <Text style={styles.friendName}>{item.friend_name}</Text>
       <Text style={[styles.amount, { color: item.net_amount < 0 ? 'red' : 'green' }]}>
         {item.net_amount < 0 ? `-$${Math.abs(item.net_amount)}` : `$${item.net_amount}`}
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -53,7 +56,7 @@ export default function Home({ navigation }) {
       <FlatList
         data={debts}
         renderItem={renderItem}
-        keyExtractor={item => item.friend_name}
+        keyExtractor={item => item.friend_id.toString()}
         contentContainerStyle={styles.listContainer}
       />
 

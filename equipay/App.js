@@ -18,6 +18,7 @@ import AdvancedFeatures from './AdvancedFeatures';
 import EditProfile from './EditProfile';
 import ImageUploader from './ImageUploder';
 import AddFriends from './AddFriends';
+import FriendsDashboard from './FriendsDashBoard';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -33,6 +34,11 @@ function HomeStack() {
       <Stack.Screen 
         name="AddFriends" 
         component={AddFriends}
+        options={{ headerShown: true }}
+      />
+      <Stack.Screen 
+        name="FriendsDashBoard" 
+        component={FriendsDashboard}
         options={{ headerShown: true }}
       />
     </Stack.Navigator>
