@@ -18,6 +18,7 @@ try:
     from api.addfriend_api import FiendList
     from api.split_expense_api import SplitExpenseTwoApi
     from api.total_amount_api import TotalAmountAPIbyID , TotalAmountAPI
+    from api.settle_api import DebtsByFriendAPI, DeleteDebtAPI
 except ImportError:
     from utilities.swen_344_db_utils import exec_sql_file
     from api.login_api import LoginAPI
@@ -32,6 +33,7 @@ except ImportError:
     from api.addfriend_api import FiendList
     from api.split_expense_api import SplitExpenseTwoApi
     from api.total_amount_api import TotalAmountAPIbyID, TotalAmountAPI
+    from api.settle_api import DebtsByFriendAPI, DeleteDebtAPI
 
 app = Flask(__name__)
 CORS(app)
@@ -56,6 +58,8 @@ api.add_resource(SplitExpenseTwoApi, '/split-expense')
 api.add_resource(TotalAmountAPIbyID, '/total-amount/<int:friend_id>')
 api.add_resource(TotalAmountAPI, '/total-amount')
 api.add_resource(FriendProfilePictureAPI, '/friend-profile-picture/<int:friend_id>')
+api.add_resource(DebtsByFriendAPI, '/debts-by-friend/<int:friend_id>')
+api.add_resource(DeleteDebtAPI, '/delete-debt')
 
 def setup_database():
     print("Loading db")

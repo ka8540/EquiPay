@@ -1,4 +1,4 @@
-from utilities.swen_344_db_utils import exec_get_one, exec_get_all
+from utilities.swen_344_db_utils import exec_get_one, exec_get_all , exec_commit
 
 def calculate_amount_owed(payer_id, receiver_id):
     print("Calculating amount owed")
@@ -37,4 +37,34 @@ def get_user_debts(user_id):
     """
     return exec_get_all(debts_query, (user_id, user_id, user_id, user_id, user_id))
 
+def get_debts_by_friend(user_id, friend_id):
+    query = """
+    SELECT d.AmountOwed, e.Description
+    FROM Debts d
+    JOIN Expenses e ON d.ExpenseID = e.ExpenseID
+    WHERE d.OwedToUserID = %s AND d.OwedByUserID = %s;
+    """
+    results = exec_get_all(query, (user_id, friend_id))
+    debts = [{'amount_owed': debt[0], 'description': debt[1]} for debt in results]
+    return debts
+
+def delete_debt(user_id, friend_id, amount_owed):
+    print("Inside the Delete Debt")
+    print("user_id:", user_id)
+    print("friend_id:", friend_id)
+    print("amount_owed:", amount_owed)
+    query = '''
+    DELETE FROM Debts
+    WHERE (OwedToUserID = %s AND OwedByUserID = %s AND AmountOwed = %s)
+    OR (OwedToUserID = %s AND OwedByUserID = %s AND AmountOwed = %s);
+    '''
+    # Execute the delete operation
+    try:
+        # The exec_commit function does not return the number of affected rows, so we assume success if no exception is raised
+        exec_commit(query, (user_id, friend_id, amount_owed, friend_id, user_id, amount_owed))
+        return True  # Assume success if no exceptions
+    except Exception as e:
+        print("Failed to delete debt:", e)
+        return False  # Return False if an exception occurs
+ # Returns True if the deletion was successful
 
