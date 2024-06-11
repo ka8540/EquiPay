@@ -3,7 +3,10 @@ DROP TABLE IF EXISTS "user" CASCADE;
 DROP TABLE IF EXISTS Expenses CASCADE;
 DROP TABLE IF EXISTS Debts CASCADE;
 DROP TABLE IF EXISTS Friends CASCADE;
-
+DROP TABLE IF EXISTS Groups CASCADE;
+DROP TABLE IF EXISTS GroupMembers CASCADE;
+DROP TABLE IF EXISTS GroupExpenses CASCADE;
+DROP TABLE IF EXISTS GroupDebts CASCADE;
 
 
 -- Create Users Table
@@ -44,6 +47,42 @@ CREATE TABLE Friends (
     Status VARCHAR(50) NOT NULL DEFAULT 'pending', -- 'pending', 'accepted', 'rejected'
     LastUpdated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Create Groups Table
+CREATE TABLE Groups (
+    GroupID SERIAL PRIMARY KEY,
+    GroupName VARCHAR(255) NOT NULL,
+    CreatedBy INT REFERENCES "user"(user_id),
+    profile_picture VARCHAR(255) DEFAULT NULL
+);
+
+-- Create GroupMembers Table
+CREATE TABLE GroupMembers (
+    MemberID SERIAL PRIMARY KEY,
+    GroupID INT REFERENCES Groups(GroupID) ON DELETE CASCADE,
+    UserID INT REFERENCES "user"(user_id) ON DELETE CASCADE,
+    IsAdmin BOOLEAN DEFAULT FALSE
+);
+
+-- Create GroupExpenses Table
+CREATE TABLE GroupExpenses (
+    ExpenseID SERIAL PRIMARY KEY,
+    GroupID INT REFERENCES Groups(GroupID) ON DELETE CASCADE,
+    PayerID INT REFERENCES "user"(user_id),
+    Amount DECIMAL(10, 2) NOT NULL,
+    Description VARCHAR(255),
+    Date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create GroupDebts Table
+CREATE TABLE GroupDebts (
+    DebtID SERIAL PRIMARY KEY,
+    ExpenseID INT REFERENCES GroupExpenses(ExpenseID),
+    OwedToUserID INT REFERENCES "user"(user_id),
+    OwedByUserID INT REFERENCES "user"(user_id),
+    AmountOwed DECIMAL(10, 2) NOT NULL
+);
+
 
 INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Rahul', 'Sharma', 'rahul', '$2b$12$YAHoV9QGxM8T/.ArdKjLTeG/5o/MLkVig.6FHXUmILpbYO2tJO8tK', 'rahul.sharma@example.com', NULL ,NULL);
 INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Anjali', 'Verma', 'anjali.verma', 'Password123!', 'anjali.verma@example.com', NULL ,NULL);
