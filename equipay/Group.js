@@ -1,35 +1,84 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 const Group = () => {
-  const [groupName, setGroupName] = useState('');
   const [groups, setGroups] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const navigation = useNavigation();
 
-  const addGroup = () => {
-    if (groupName.trim() !== '') {
-      setGroups([...groups, groupName]);
-      setGroupName('');
+  useEffect(() => {
+    fetchGroups();
+  }, []);
+
+  const fetchGroups = async () => {
+    setIsLoading(true);
+    const token = await AsyncStorage.getItem('jwt_token');
+    if (token) {
+      fetch('http://127.0.0.1:5000/user_group', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then(response => response.json())
+      .then(data => {
+        setGroups(data.length ? data : ['No groups']);
+      })
+      .catch(error => {
+        console.error('Error fetching groups:', error);
+        setGroups(['No groups']);
+      })
+      .finally(() => {
+        setIsLoading(false);
+        setRefreshing(false);
+      });
+    } else {
+      setGroups(['No groups']);
+      setIsLoading(false);
+      setRefreshing(false);
     }
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchGroups();  // Call your API fetch function here
   };
 
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter Group Name"
-        value={groupName}
-        onChangeText={setGroupName}
-      />
-      <Button title="Add Group" onPress={addGroup} />
-      <FlatList
-        data={groups}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.groupItem}>
-            <Text style={styles.groupText}>{item}</Text>
-          </View>
-        )}
-      />
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.navigate('GroupAddMembers')}>
+          <MaterialCommunityIcons name="account-multiple-plus" size={30} color="#000" />
+        </TouchableOpacity>
+      </View>
+      {isLoading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <FlatList
+          data={groups}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.groupItem}>
+              <Text style={styles.groupText}>{typeof item === 'string' ? item : item.group_name}</Text>
+            </View>
+          )}
+          ListEmptyComponent={() => (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No groups</Text>
+            </View>
+          )}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+            />
+          }
+        />
+      )}
     </View>
   );
 };
@@ -40,12 +89,11 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#fff',
   },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginBottom: 20,
+    marginTop: 50,
   },
   groupItem: {
     padding: 10,
@@ -57,6 +105,16 @@ const styles = StyleSheet.create({
   },
   groupText: {
     fontSize: 16,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyText: {
+    fontSize: 18,
+    color: '#666',
   },
 });
 

@@ -19,7 +19,8 @@ import EditProfile from './EditProfile';
 import ImageUploader from './ImageUploder';
 import AddFriends from './AddFriends';
 import FriendsDashboard from './FriendsDashBoard';
-
+import GroupAddMembers from './GroupAddMembers';
+import GroupImage from './GroupImage';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -40,6 +41,23 @@ function HomeStack() {
         name="FriendsDashBoard" 
         component={FriendsDashboard}
         options={{ headerShown: true }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+function GroupStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen 
+        name="Group" 
+        component={Group} 
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen 
+        name="GroupAddMembers" 
+        component={GroupAddMembers}
+        options={{ headerShown: true, title: "Add Members" }}
       />
     </Stack.Navigator>
   );
@@ -85,7 +103,7 @@ function MainAppTabs() {
       })}
     >
       <Tab.Screen name="Home" component={HomeStack} />
-      <Tab.Screen name="Group" component={Group} />
+      <Tab.Screen name="Group" component={GroupStack} />
       <Tab.Screen name="Add" component={MenuStack} />
       <Tab.Screen name="Activity" component={Activity} />
       <Tab.Screen name="Account" component={Account} />

@@ -96,6 +96,15 @@ def update_user_image_url(user_id, url):
     except Exception as e:
         print(f"Database Error: {e}")
         return "Failed to update image URL"
+    
+def update_group_image_url(user_id, url):
+    query = '''UPDATE Groups SET profile_pic = %s WHERE GroupID = %s;'''
+    try:
+        exec_commit(query, (url, user_id))
+        return "Image URL updated successfully"
+    except Exception as e:
+        print(f"Database Error: {e}")
+        return "Failed to update image URL"    
 
 def profile_picture(username):
     print("Inside the profile picture def")

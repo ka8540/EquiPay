@@ -20,6 +20,9 @@ try:
     from api.total_amount_api import TotalAmountAPIbyID , TotalAmountAPI
     from api.settle_api import DebtsByFriendAPI, DeleteDebtAPI
     from api.create_group_api import UserGroupsAPI, CreateGroupAPI
+    from api.profile_pic_api import GroupProfilePictureUpload
+    from api.group_api import GroupMembersAPI
+    from api.group_api import GroupNameByIdAPI
 except ImportError:
     from utilities.swen_344_db_utils import exec_sql_file
     from api.login_api import LoginAPI
@@ -36,6 +39,9 @@ except ImportError:
     from api.total_amount_api import TotalAmountAPIbyID, TotalAmountAPI
     from api.settle_api import DebtsByFriendAPI, DeleteDebtAPI
     from api.create_group_api import UserGroupsAPI, CreateGroupAPI
+    from api.profile_pic_api import GroupProfilePictureUpload
+    from api.group_api import GroupMembersAPI
+    from api.group_api import GroupNameByIdAPI
 
 app = Flask(__name__)
 CORS(app)
@@ -64,6 +70,9 @@ api.add_resource(DebtsByFriendAPI, '/debts-by-friend/<int:friend_id>')
 api.add_resource(DeleteDebtAPI, '/delete-debt')
 api.add_resource(UserGroupsAPI,'/user_group')
 api.add_resource(CreateGroupAPI, '/create_group')
+api.add_resource(GroupProfilePictureUpload, '/group_photo')
+api.add_resource(GroupMembersAPI, '/group_members/<int:group_id>')
+api.add_resource(GroupNameByIdAPI, '/group_name/<int:group_id>')
 
 def setup_database():
     print("Loading db")
