@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
-import { Button, Image, View, StyleSheet, Alert, Text ,TouchableOpacity} from 'react-native';
+import { Button, Image, View, StyleSheet, Alert, Text, TouchableOpacity } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRoute } from '@react-navigation/native';
 
-const GroupImage = ({navigation}) => {
+const GroupImage = ({ navigation }) => {
     const [imageUri, setImageUri] = useState(null);
+    const route = useRoute();
+    const { group_id } = route.params; // Ensure that group_id is passed via navigation params
 
     const pickImageAndUpload = async () => {
-        const sessionKey = await AsyncStorage.getItem('sessionKey');
         const token = await AsyncStorage.getItem('jwt_token');
 
-        if (!sessionKey || !token) {
-            Alert.alert("Error", "Session key or JWT token not found");
+        if (!token) {
+            Alert.alert("Error", "JWT token not found");
             return;
         }
 
@@ -28,7 +30,6 @@ const GroupImage = ({navigation}) => {
             quality: 1,
         });
 
-        console.log("Result:", result);
         if (result.cancelled) {
             Alert.alert("Cancelled", "Image selection was cancelled.");
             return;
@@ -48,12 +49,12 @@ const GroupImage = ({navigation}) => {
         const formData = new FormData();
         formData.append('file', { uri: localUri, name: filename, type });
 
-        fetch('http://127.0.0.1:5000/upload', {
+        fetch(`http://127.0.0.1:5000/group_photo/${group_id}`, { // Modified to include group_id in the URL
             method: 'POST',
             body: formData,
             headers: {
                 'Authorization': `Bearer ${token}`,
-                'Session-Key': sessionKey
+                'Content-Type': 'multipart/form-data',
             },
         })
         .then(response => response.json())
@@ -76,7 +77,7 @@ const GroupImage = ({navigation}) => {
                     <Text style={styles.imageText}>Image Preview</Text>
                 </View>
             )}
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('ViewProfile')}>
+            <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
                     <Text style={styles.buttonText}>Go Back</Text>
             </TouchableOpacity>
         </View>

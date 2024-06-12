@@ -97,10 +97,10 @@ def update_user_image_url(user_id, url):
         print(f"Database Error: {e}")
         return "Failed to update image URL"
     
-def update_group_image_url(user_id, url):
-    query = '''UPDATE Groups SET profile_pic = %s WHERE GroupID = %s;'''
+def update_group_image_url(group_id, url):
+    query = '''UPDATE Groups SET profile_picture = %s WHERE GroupID = %s;'''
     try:
-        exec_commit(query, (url, user_id))
+        exec_commit(query, (url, group_id))
         return "Image URL updated successfully"
     except Exception as e:
         print(f"Database Error: {e}")
@@ -117,6 +117,17 @@ def profile_picture(username):
         return result[0]  # Modify based on how your data is structured
     else:
         return None
+    
+def group_profile_picture(group_id):
+    print("Inside the Group profile Picture")
+    query = '''SELECT profile_picture FROM Groups WHERE GroupID = %s'''
+    result = exec_get_all(query,(group_id,))
+    print("Result:",result)
+    if result:
+        return result[0]
+    else:
+        return None
+
 
 def check_friendship_and_get_profile_pic(user_id, friend_id):
     query = '''

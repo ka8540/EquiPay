@@ -62,9 +62,12 @@ const Group = () => {
           data={groups}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (
-            <View style={styles.groupItem}>
+            <TouchableOpacity
+              style={styles.groupItem}
+              onPress={() => typeof item === 'object' && navigation.navigate('GroupMembersDashboard', { group_id: item.group_id })}
+            >
               <Text style={styles.groupText}>{typeof item === 'string' ? item : item.group_name}</Text>
-            </View>
+            </TouchableOpacity>
           )}
           ListEmptyComponent={() => (
             <View style={styles.emptyContainer}>
@@ -93,7 +96,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     marginBottom: 20,
-    marginTop: 50,
+    marginTop: 50, // Increased margin-top to push the header down
   },
   groupItem: {
     padding: 10,
@@ -102,6 +105,7 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderWidth: 1,
     borderRadius: 5,
+    marginTop: 15, // Increased margin-top for each group item to space them further from the header
   },
   groupText: {
     fontSize: 16,

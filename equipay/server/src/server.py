@@ -23,6 +23,7 @@ try:
     from api.profile_pic_api import GroupProfilePictureUpload
     from api.group_api import GroupMembersAPI
     from api.group_api import GroupNameByIdAPI
+    from api.profile_pic_api import GroupProfilePictureUpload
 except ImportError:
     from utilities.swen_344_db_utils import exec_sql_file
     from api.login_api import LoginAPI
@@ -42,6 +43,7 @@ except ImportError:
     from api.profile_pic_api import GroupProfilePictureUpload
     from api.group_api import GroupMembersAPI
     from api.group_api import GroupNameByIdAPI
+    from api.profile_pic_api import GroupProfilePictureUpload
 
 app = Flask(__name__)
 CORS(app)
@@ -73,6 +75,8 @@ api.add_resource(CreateGroupAPI, '/create_group')
 api.add_resource(GroupProfilePictureUpload, '/group_photo')
 api.add_resource(GroupMembersAPI, '/group_members/<int:group_id>')
 api.add_resource(GroupNameByIdAPI, '/group_name/<int:group_id>')
+api.add_resource(GroupProfilePictureUpload, '/group_photo/<int:group_id>', endpoint='group_photo_upload')
+
 
 def setup_database():
     print("Loading db")

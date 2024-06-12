@@ -21,6 +21,7 @@ import AddFriends from './AddFriends';
 import FriendsDashboard from './FriendsDashBoard';
 import GroupAddMembers from './GroupAddMembers';
 import GroupImage from './GroupImage';
+import GroupMembersDashboard from './GroupMembersDashboard';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -40,6 +41,16 @@ function HomeStack() {
       <Stack.Screen 
         name="FriendsDashBoard" 
         component={FriendsDashboard}
+        options={{ headerShown: true }}
+      />
+      <Stack.Screen 
+        name="GroupMembersDashboard" 
+        component={GroupMembersDashboard}
+        options={{ headerShown: true }}
+      />
+      <Stack.Screen 
+        name="GroupImage" 
+        component={GroupImage}
         options={{ headerShown: true }}
       />
     </Stack.Navigator>
