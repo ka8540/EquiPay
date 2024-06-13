@@ -5,22 +5,22 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Menu = ({ navigation }) => {
   const [users, setUsers] = useState([]);
+  const [groups, setGroups] = useState([]);
   const [selectedUserIds, setSelectedUserIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchUsers();
+    fetchGroups();
   }, []);
 
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const sessionKey = await AsyncStorage.getItem('sessionKey');
       const token = await AsyncStorage.getItem('jwt_token');
-      console.log('Token:',token);
-      if (!sessionKey || !token) {
-        Alert.alert('Error', 'Missing session key or token');
+      if (!token) {
+        Alert.alert('Error', 'JWT token not found');
         setLoading(false);
         return;
       }
@@ -28,13 +28,12 @@ const Menu = ({ navigation }) => {
       const response = await axios.get('http://127.0.0.1:5000/friends', {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Session-Key': sessionKey,
         },
       });
 
       const transformedData = response.data.map(user => ({
-        id: user[0].toString(), // Ensure id is a string for keyExtractor
-        name: user[1], // Assuming the second element is the name
+        id: user[0].toString(),
+        name: user[1],
       }));
 
       setUsers(transformedData);
@@ -47,22 +46,50 @@ const Menu = ({ navigation }) => {
     }
   };
 
+  const fetchGroups = async () => {
+    setLoading(true);
+    const token = await AsyncStorage.getItem('jwt_token');
+    console.log("Token:",token);
+    if (!token) {
+      Alert.alert('Error', 'JWT token not found');
+      setLoading(false);
+      return;
+    }
+  
+    try {
+      const response = await axios.get('http://127.0.0.1:5000/user_group', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      // Check if the response data is valid and is an array
+      if (response.data && Array.isArray(response.data)) {
+        setGroups(response.data.map(group => ({
+          group_id: group.group_id.toString(), // Ensure group_id is a string
+          group_name: group.group_name
+        })));
+      } else {
+        setGroups([]); // Set to an empty array if no valid data
+      }
+    } catch (error) {
+      console.error('Error fetching groups:', error);
+      setGroups([]); // Set to an empty array in case of error
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+
   const handleRefresh = () => {
     setRefreshing(true);
     fetchUsers();
+    fetchGroups();
   };
 
-  const handleSelectUser = (userId) => {
+  const handleSelectUser = userId => {
     const isSelected = selectedUserIds.includes(userId);
     if (isSelected) {
       setSelectedUserIds(currentIds => currentIds.filter(id => id !== userId));
     } else {
-      if (selectedUserIds.length < 4) {
-        setSelectedUserIds(currentIds => [...currentIds, userId]);
-      } else {
-        Alert.alert("Limit reached", "You can select up to 4 friends.");
-      }
-      console.log("selected ids:",selectedUserIds)
+      setSelectedUserIds(currentIds => [...currentIds, userId]);
     }
   };
 
@@ -74,7 +101,19 @@ const Menu = ({ navigation }) => {
     navigation.navigate('AddItem', { userIds: selectedUserIds });
   };
 
-  const renderItem = ({ item }) => (
+  const renderGroupItem = ({ item }) => (
+    <TouchableOpacity
+      style={[
+        styles.row,
+        { backgroundColor: '#d0ebff' }
+      ]}
+      onPress={() => navigation.navigate('GroupMembers', { groupId: item.group_id })}
+    >
+      <Text style={styles.cell}>{item.group_name}</Text>
+    </TouchableOpacity>
+  );
+
+  const renderUserItem = ({ item }) => (
     <TouchableOpacity
       style={[
         styles.row,
@@ -93,17 +132,18 @@ const Menu = ({ navigation }) => {
         <Text>Loading...</Text>
       ) : (
         <>
+          <Text style={styles.sectionHeader}>Friends</Text>
           <FlatList
             data={users}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={renderItem}
-            contentContainerStyle={styles.listContainer}
-            RefreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={handleRefresh}
-              />
-            }
+            keyExtractor={item => item.id.toString()}
+            renderItem={renderUserItem}
+            RefreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
+          />
+          <Text style={styles.sectionHeader}>Groups</Text>
+          <FlatList
+            data={groups}
+            keyExtractor={item => item.group_id.toString()}
+            renderItem={renderGroupItem}
           />
           <Button title="Continue" onPress={navigateToAddItem} />
         </>
@@ -129,6 +169,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderBottomWidth: 1,
     borderColor: '#ccc',
+  },
+  sectionHeader: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  groupName: {
+    fontSize: 16,
+    color: '#333',
   },
   cell: {
     fontSize: 16,

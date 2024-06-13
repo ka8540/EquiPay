@@ -22,6 +22,8 @@ import FriendsDashboard from './FriendsDashBoard';
 import GroupAddMembers from './GroupAddMembers';
 import GroupImage from './GroupImage';
 import GroupMembersDashboard from './GroupMembersDashboard';
+import GroupMembers from './GroupMembers';
+import AddGroupExpense from './AddGroupExpense';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -80,6 +82,8 @@ function MenuStack() {
     <Stack.Navigator>
       <Stack.Screen name="Menu" component={Menu} />
       <Stack.Screen name="AddItem" component={AddItem} />
+      <Stack.Screen name="GroupMembers" component={GroupMembers} />
+      <Stack.Screen name="AddGroupExpense" component={AddGroupExpense} />
     </Stack.Navigator>
   );
 }

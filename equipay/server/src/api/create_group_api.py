@@ -20,7 +20,7 @@ class UserGroupsAPI(Resource):
         try:
             groups = get_groups_by_user_id(user_id)
             if not groups:
-                return make_response(jsonify({"message": "No groups found"}), 404)
+                return make_response(jsonify({"message": "No groups found"}), 201)
             return jsonify(groups)
         except Exception as e:
             # Log the exception or handle it as needed
@@ -53,3 +53,6 @@ class CreateGroupAPI(Resource):
                 add_group_member(group_id, friend_id, False)
 
         return make_response(jsonify({"message": "Group created successfully", "group_id": group_id}), 200)
+    
+
+

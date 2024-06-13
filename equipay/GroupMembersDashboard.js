@@ -62,6 +62,7 @@ const GroupMembersDashboard = () => {
       const response = await axios.get(`http://127.0.0.1:5000/group_members/${groupId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      console.log("Resonse:",response.data);
       setMembers(response.data);
     } catch (error) {
       Alert.alert("Error", "Failed to fetch group members");
