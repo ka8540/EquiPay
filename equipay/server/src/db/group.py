@@ -103,3 +103,46 @@ def create_group_expense(group_id, payer_id, amount, description):
     else:
         print("No Group Expense ID retrieved")
         return None
+
+
+def calculate_group_amount_owed(group_id, payer_id, receiver_id):
+    print("payer_id:",payer_id)
+    print("receiver_id:",receiver_id)
+    print("Calculating amount owed within group")
+    query = """
+    SELECT COALESCE(SUM(AmountOwed), 0) FROM GroupDebts gd
+    JOIN GroupExpenses ge ON gd.ExpenseID = ge.ExpenseID
+    WHERE ge.GroupID = %s AND gd.OwedToUserID = %s AND gd.OwedByUserID = %s;
+    """
+    amount = exec_get_one(query, (group_id, payer_id, receiver_id))
+    print("Amount:",amount)
+    return amount[0] if amount else 0
+
+def get_group_debts(group_id, user_id):
+    print("Retrieving group debts for group:", group_id, "excluding user:", user_id)
+    debts_query = """
+    SELECT 
+    gd.OwedByUserID AS creditor_id, 
+    gd.OwedToUserID AS debtor_id, 
+    u.firstname AS debtor_name, 
+    u2.firstname AS creditor_name, 
+    SUM(gd.AmountOwed) AS total_owed
+    FROM GroupDebts gd
+    JOIN GroupExpenses ge ON gd.ExpenseID = ge.ExpenseID
+    JOIN "user" u ON gd.OwedByUserID = u.user_id
+    JOIN "user" u2 ON gd.OwedToUserID = u2.user_id
+    WHERE ge.GroupID = %s AND (gd.OwedByUserID = %s OR gd.OwedToUserID = %s) AND gd.OwedByUserID != gd.OwedToUserID
+    GROUP BY gd.OwedByUserID, gd.OwedToUserID, u.firstname, u2.firstname;
+
+    """
+    return exec_get_all(debts_query, (group_id, user_id, user_id))
+
+
+
+def get_group_member_ids(group_id):
+    print("Fetching group member IDs")
+    member_query = """
+    SELECT UserID FROM GroupMembers WHERE GroupID = %s;
+    """
+    member_ids = exec_get_all(member_query, (group_id,))
+    return [member_id[0] for member_id in member_ids]

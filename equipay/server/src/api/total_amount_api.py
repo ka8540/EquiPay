@@ -48,13 +48,13 @@ class TotalAmountAPI(Resource):
             return jsonify({"message": "User not found"}), 404
 
         debts = get_user_debts(user_id)
-        results = []  # Initialize an empty list for results
+        results = [] 
         for friend_id, friend_name, net_amount in debts:
-            if net_amount != 0:  # Only include non-zero balances
+            if net_amount != 0: 
                 results.append({
-                    "friend_id": friend_id,  # Include the friend_id in the result
+                    "friend_id": friend_id,  
                     "friend_name": friend_name,
-                    "net_amount": float(net_amount)  # Convert Decimal to float for JSON serialization
+                    "net_amount": float(net_amount) 
                 })
 
         print("Debt results:", results)
