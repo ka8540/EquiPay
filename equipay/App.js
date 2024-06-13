@@ -45,16 +45,6 @@ function HomeStack() {
         component={FriendsDashboard}
         options={{ headerShown: true }}
       />
-      <Stack.Screen 
-        name="GroupMembersDashboard" 
-        component={GroupMembersDashboard}
-        options={{ headerShown: true }}
-      />
-      <Stack.Screen 
-        name="GroupImage" 
-        component={GroupImage}
-        options={{ headerShown: true }}
-      />
     </Stack.Navigator>
   );
 }
@@ -71,6 +61,16 @@ function GroupStack() {
         name="GroupAddMembers" 
         component={GroupAddMembers}
         options={{ headerShown: true, title: "Add Members" }}
+      />
+      <Stack.Screen 
+        name="GroupMembersDashboard" 
+        component={GroupMembersDashboard}
+        options={{ headerShown: true }}
+      />
+      <Stack.Screen 
+        name="GroupImage" 
+        component={GroupImage}
+        options={{ headerShown: true }}
       />
     </Stack.Navigator>
   );

@@ -146,3 +146,24 @@ def get_group_member_ids(group_id):
     """
     member_ids = exec_get_all(member_query, (group_id,))
     return [member_id[0] for member_id in member_ids]
+
+def delete_group_debt(user_id, friend_id, amount_owed, group_id):
+    print("Inside the Delete Debt")
+    print("user_id:", user_id)
+    print("friend_id:", friend_id)
+    print("amount_owed:", amount_owed)
+    print("group_id:", group_id)
+    query = '''
+    DELETE FROM GroupDebts
+    WHERE ((OwedToUserID = %s AND OwedByUserID = %s AND AmountOwed = %s AND ExpenseID IN 
+           (SELECT ExpenseID FROM GroupExpenses WHERE GroupID = %s))
+           OR (OwedToUserID = %s AND OwedByUserID = %s AND AmountOwed = %s AND ExpenseID IN 
+           (SELECT ExpenseID FROM GroupExpenses WHERE GroupID = %s)));
+    '''
+    try:
+        exec_commit(query, (user_id, friend_id, amount_owed, group_id, friend_id, user_id, amount_owed, group_id))
+        return True
+    except Exception as e:
+        print("Failed to delete debt:", e)
+        return False
+

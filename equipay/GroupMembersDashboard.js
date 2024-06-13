@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Image, FlatList, StyleSheet, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Image, FlatList, StyleSheet, Alert, RefreshControl } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,23 +9,42 @@ const GroupMembersDashboard = () => {
   const [groupName, setGroupName] = useState('');
   const [groupImage, setGroupImage] = useState(null);
   const [members, setMembers] = useState([]);
+  const [selectedMemberId, setSelectedMemberId] = useState(null);
   const navigation = useNavigation();
   const route = useRoute();
   const { group_id } = route.params;
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    fetchGroupName(group_id);
-    fetchGroupImage(group_id);
-    fetchGroupMembers(group_id);
+    loadData();
 
-    // Set up a listener for when this screen is focused to refresh data
     const unsubscribe = navigation.addListener('focus', () => {
-      // Re-fetch group image or other data as necessary
-      fetchGroupImage(group_id);
+      loadData();
     });
 
     return unsubscribe; // Cleanup listener on unmount
   }, [navigation, group_id]);
+
+  const loadData = async () => {
+    setRefreshing(true);
+    await fetchGroupName(group_id);
+    await fetchGroupImage(group_id);
+    await fetchGroupMembers(group_id);
+    setRefreshing(false);
+  };
+
+  const onRefresh = () => {
+    loadData();
+  };
+
+  const selectMember = (member) => {
+    if (member.debtAmount > 0) {
+      setSelectedMemberId(member.user_id);
+    } else {
+      setSelectedMemberId(null);
+    }
+  };
+
 
   const fetchGroupName = async (groupId) => {
     const token = await AsyncStorage.getItem('jwt_token');
@@ -57,7 +76,28 @@ const GroupMembersDashboard = () => {
   };
 
   
+  const handleSettleDebt = async (friend_id, amount) => {
+    const token = await AsyncStorage.getItem('jwt_token');
+    try {
+      const response = await axios.post(`http://127.0.0.1:5000/group_settle/${group_id}`, {
+        friend_id,
+        amount_owed: amount
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.status === 200) {
+        Alert.alert("Success", "Debt settled successfully");
+        loadData(); // Refresh data
+      } else {
+        Alert.alert("Error", "Failed to settle debt");
+      }
+    } catch (error) {
+      console.error('Error settling debt:', error);
+      Alert.alert("Error", "Failed to settle debt");
+    }
+  };
 
+  
   const fetchGroupMembers = async (groupId) => {
     const token = await AsyncStorage.getItem('jwt_token');
     try {
@@ -87,8 +127,6 @@ const GroupMembersDashboard = () => {
     }
   };
   
-
-  
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -108,20 +146,32 @@ const GroupMembersDashboard = () => {
         data={members}
         keyExtractor={item => item.user_id.toString()}
         renderItem={({ item }) => (
-          <View style={styles.memberItem}>
+          <TouchableOpacity style={styles.memberItem} onPress={() => selectMember(item)}>
             <Ionicons name={item.is_admin ? 'shield-checkmark' : 'people'} size={24} color="#4CAF50" />
             <Text style={styles.memberName}>
-              {item.first_name} ({item.is_admin ? 'Admin' : 'Member'})
+              {item.first_name} 
             </Text>
             <Text style={[
-                styles.debtAmount,
-                { color: item.debtAmount >= 0 ? 'green' : 'red' }  // Conditional styling based on debtAmount
+              styles.debtAmount,
+              {
+                color: item.debtAmount >= 0 ? 'green' : 'red', // Apply green or red color based on debt amount
+                position: 'absolute',  // Position it absolutely
+                right: 10  // Adjust the left value as needed to position it from the left side of its container
+              }
             ]}>
-              - Debt: ${item.debtAmount.toFixed(2)}
+              ${item.debtAmount.toFixed(2)}
             </Text>
-          </View>
+
+            {selectedMemberId === item.user_id && item.debtAmount > 0 && (
+              <TouchableOpacity style={styles.settleButton} onPress={() => handleSettleDebt(item.user_id, item.debtAmount)}>
+                <Text style={styles.settleButtonText}>Settle Debt</Text>
+              </TouchableOpacity>
+            )}
+          </TouchableOpacity>
         )}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       />
+
     </View>
   );
 };
@@ -190,6 +240,19 @@ const styles = StyleSheet.create({
   debtAmount: {
     fontSize: 16,  // Matching font size of memberName for consistency
     marginLeft: 5,  // Slight margin for visual separation
+  },
+  settleButton: {
+    backgroundColor: 'green',
+    padding: 10,
+    borderRadius: 5,
+    margin: 5,
+    position: 'absolute',
+    right: 150
+  },
+  settleButtonText: {
+    color: 'white',
+    fontSize: 16,
+    textAlign: 'center',
   }
 });
 
