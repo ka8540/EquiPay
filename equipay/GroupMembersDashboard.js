@@ -56,19 +56,39 @@ const GroupMembersDashboard = () => {
     }
   };
 
+  
+
   const fetchGroupMembers = async (groupId) => {
     const token = await AsyncStorage.getItem('jwt_token');
     try {
-      const response = await axios.get(`http://127.0.0.1:5000/group_members/${groupId}`, {
+      const membersResponse = await axios.get(`http://127.0.0.1:5000/group_members/${groupId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      console.log("Resonse:",response.data);
-      setMembers(response.data);
+      console.log("MemberResponse:", membersResponse.data);
+      if (membersResponse.data) {
+        const membersWithDebts = await Promise.all(membersResponse.data.map(async member => {
+          try {
+            const debtResponse = await axios.get(`http://127.0.0.1:5000/group_total/${groupId}/${member.user_id}`, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            console.log("debtResponse:", debtResponse.data);
+            // Ensure debtAmount is always a number
+            return { ...member, debtAmount: parseFloat(debtResponse.data.net_amount) || 0 };  // Use parseFloat to ensure it's a number
+          } catch (debtError) {
+            console.error('Error fetching debt for member:', member.user_id, debtError);
+            return { ...member, debtAmount: 0 };  // Default to 0 if there's an error
+          }
+        }));
+        setMembers(membersWithDebts);
+      }
     } catch (error) {
+      console.error('Error fetching group members:', error);
       Alert.alert("Error", "Failed to fetch group members");
     }
   };
+  
 
+  
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -90,7 +110,15 @@ const GroupMembersDashboard = () => {
         renderItem={({ item }) => (
           <View style={styles.memberItem}>
             <Ionicons name={item.is_admin ? 'shield-checkmark' : 'people'} size={24} color="#4CAF50" />
-            <Text style={styles.memberName}>{item.first_name} ({item.is_admin ? 'Admin' : 'Member'})</Text>
+            <Text style={styles.memberName}>
+              {item.first_name} ({item.is_admin ? 'Admin' : 'Member'})
+            </Text>
+            <Text style={[
+                styles.debtAmount,
+                { color: item.debtAmount >= 0 ? 'green' : 'red' }  // Conditional styling based on debtAmount
+            ]}>
+              - Debt: ${item.debtAmount.toFixed(2)}
+            </Text>
           </View>
         )}
       />
@@ -99,66 +127,71 @@ const GroupMembersDashboard = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#f0f0f0',
-    },
-    header: {
-      flexDirection: 'row',
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingTop: 50,  // Increased top padding to push down the content, fitting the profile image
-      paddingBottom: 30,
-      paddingHorizontal: 10,
-      borderBottomWidth: 1,
-      borderBottomColor: '#cccccc',
-      backgroundColor: '#ffffff',
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 2,
-      elevation: 2,
-    },
-    profilePicContainer: {
-      position: 'absolute',
-      left: 15,
-      top: 10,  // Minor adjustment if needed for top position
-      width: 100,
-      height: 100,
-      borderRadius: 50,
-      backgroundColor: '#e0e0e0',
-      overflow: 'hidden',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    profilePic: {
-      width: '100%',
-      height: '100%',
-    },
-    addPhotoText: {
-      fontSize: 12,
-      color: '#888888',
-    },
-    groupName: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: '#333333',
-      marginBottom:10,
-    },
-    memberItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      padding: 15,
-      borderBottomWidth: 1,
-      borderBottomColor: '#eaeaea',
-      backgroundColor: '#ffffff',
-      marginTop: 10,
-    },
-    memberName: {
-      fontSize: 16,
-      color: '#555555',
-      marginLeft: 10,
-    },
-  });
-  
+  container: {
+    flex: 1,
+    backgroundColor: '#f0f0f0',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 50,
+    paddingBottom: 30,
+    paddingHorizontal: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#cccccc',
+    backgroundColor: '#ffffff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  profilePicContainer: {
+    position: 'absolute',
+    left: 15,
+    top: 10,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#e0e0e0',
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profilePic: {
+    width: '100%',
+    height: '100%',
+  },
+  addPhotoText: {
+    fontSize: 12,
+    color: '#888888',
+  },
+  groupName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333333',
+    marginBottom: 10,
+  },
+  memberItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eaeaea',
+    backgroundColor: '#ffffff',
+    marginTop: 10,
+  },
+  memberName: {
+    fontSize: 16,
+    color: '#555555',
+    marginLeft: 10,
+  },
+  debtAmount: {
+    fontSize: 16,  // Matching font size of memberName for consistency
+    marginLeft: 5,  // Slight margin for visual separation
+  }
+});
+
 export default GroupMembersDashboard;
+
