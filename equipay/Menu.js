@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Button, FlatList, Text, TouchableOpacity, StyleSheet, Alert, RefreshControl } from 'react-native';
+import { View, Button, FlatList, Text, TouchableOpacity, StyleSheet, Alert, RefreshControl , loadData} from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -15,6 +15,14 @@ const Menu = ({ navigation }) => {
     fetchGroups();
   }, []);
 
+  const handleRefresh = () => {
+    setRefreshing(true);
+    Promise.all([fetchUsers(), fetchGroups()]).finally(() => {
+        setRefreshing(false);
+    });
+};
+
+  
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -76,13 +84,6 @@ const Menu = ({ navigation }) => {
       setLoading(false);
     }
   };
-  
-
-  const handleRefresh = () => {
-    setRefreshing(true);
-    fetchUsers();
-    fetchGroups();
-  };
 
   const handleSelectUser = userId => {
     const isSelected = selectedUserIds.includes(userId);
@@ -105,7 +106,7 @@ const Menu = ({ navigation }) => {
     <TouchableOpacity
       style={[
         styles.row,
-        { backgroundColor: '#d0ebff' }
+        { backgroundColor: '#fff' }
       ]}
       onPress={() => navigation.navigate('GroupMembers', { groupId: item.group_id })}
     >
@@ -134,17 +135,28 @@ const Menu = ({ navigation }) => {
         <>
           <Text style={styles.sectionHeader}>Friends</Text>
           <FlatList
-            data={users}
-            keyExtractor={item => item.id.toString()}
-            renderItem={renderUserItem}
-            RefreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
-          />
-          <Text style={styles.sectionHeader}>Groups</Text>
-          <FlatList
-            data={groups}
-            keyExtractor={item => item.group_id.toString()}
-            renderItem={renderGroupItem}
-          />
+              data={users}
+              keyExtractor={item => item.id.toString()}
+              renderItem={renderUserItem}
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={handleRefresh}
+                />
+              }
+            />
+            <Text style={styles.sectionHeader}>Groups</Text>
+            <FlatList
+              data={groups}
+              keyExtractor={item => item.group_id.toString()}
+              renderItem={renderGroupItem}
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={handleRefresh}
+                />
+              }
+            />
           <Button title="Continue" onPress={navigateToAddItem} />
         </>
       )}

@@ -167,3 +167,29 @@ def delete_group_debt(user_id, friend_id, amount_owed, group_id):
         print("Failed to delete debt:", e)
         return False
 
+def get_group_expenses(user_id, group_id):
+    query = """
+    SELECT 
+        ge.ExpenseID,
+        ge.Description,
+        ge.Amount AS TotalAmount,
+        u.firstname AS PayerName,
+        ge.Date AS ExpenseDate,
+        COALESCE(SUM(CASE 
+            WHEN gd.OwedByUserID = %s AND gd.OwedToUserID != %s THEN -gd.AmountOwed
+            WHEN gd.OwedToUserID = %s AND gd.OwedByUserID != %s THEN gd.AmountOwed
+            ELSE 0
+        END), 0) AS LentOrBorrowedAmount
+    FROM 
+        GroupExpenses ge
+    JOIN 
+        "user" u ON ge.PayerID = u.user_id
+    LEFT JOIN 
+        GroupDebts gd ON ge.ExpenseID = gd.ExpenseID
+    WHERE 
+        ge.GroupID = %s
+    GROUP BY
+        ge.ExpenseID, ge.Description, ge.Amount, u.firstname, ge.Date;
+    """
+    return exec_get_all(query, (user_id, user_id, user_id, user_id, group_id))
+
