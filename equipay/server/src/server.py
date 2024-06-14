@@ -28,6 +28,7 @@ try:
     from api.group_total_expense_api import TotalGroupAmountAPI
     from api.group_total_expense_api import TotalGroupAmountAPIbyID
     from api.group_settle_api import DeleteGroupDebtByIdAPI
+    from api.textract_upload_api import UploadAndAnalyzeAPI
 except ImportError:
     from utilities.swen_344_db_utils import exec_sql_file
     from api.login_api import LoginAPI
@@ -52,6 +53,7 @@ except ImportError:
     from api.group_total_expense_api import TotalGroupAmountAPI
     from api.group_total_expense_api import TotalGroupAmountAPIbyID
     from api.group_settle_api import DeleteGroupDebtByIdAPI
+    from api.textract_upload_api import UploadAndAnalyzeAPI
 
 app = Flask(__name__)
 CORS(app)
@@ -88,7 +90,7 @@ api.add_resource(GroupExpenseAPI, '/group_expense/<int:group_id>')
 api.add_resource(TotalGroupAmountAPI, '/group_total/<int:group_id>')
 api.add_resource(TotalGroupAmountAPIbyID, '/group_total/<int:group_id>/<int:friend_id>')
 api.add_resource(DeleteGroupDebtByIdAPI,'/group_settle/<int:group_id>')
-
+api.add_resource(UploadAndAnalyzeAPI, '/upload-and-analyze')
 
 def setup_database():
     print("Loading db")

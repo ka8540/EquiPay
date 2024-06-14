@@ -72,22 +72,6 @@ export default function Home({ navigation }) {
           <MaterialIcons name="person-add" size={28} color="black" />
         </TouchableOpacity>
       )}
-      ListFooterComponent={(
-        <View style={styles.menu}>
-          <TouchableOpacity
-            style={styles.menuButton}
-            onPress={() => navigation.navigate('Home')}
-          >
-            <Text style={styles.menuText}>Home</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.menuButton}
-            onPress={() => navigation.navigate('Account')}
-          >
-            <Text style={styles.menuText}>Account</Text>
-          </TouchableOpacity>
-        </View>
-      )}
     />
   );  
 }
