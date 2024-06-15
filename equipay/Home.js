@@ -1,47 +1,80 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, RefreshControl, ScrollView } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, RefreshControl, StatusBar, SafeAreaView, Animated } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
 export default function Home({ navigation }) {
   const [debts, setDebts] = useState([]);
+  const [netAmount, setNetAmount] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(0)).current;  // Initial opacity
+  const [isExpanded, setIsExpanded] = useState(false);
+  const animationController = useRef(new Animated.Value(0)).current;  // Initial value for collapsed
 
   useEffect(() => {
     fetchDebts();
-  }, []);
+    fetchNetAmount();
 
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 2000,
+      useNativeDriver: true
+    }).start();
+  }, []);
+  
+  const toggleExpansion = () => {
+    setIsExpanded(!isExpanded);
+    Animated.timing(animationController, {
+      toValue: isExpanded ? 0 : 1,  // 0 if collapsed, 1 if expanded
+      duration: 300,
+      useNativeDriver: false
+    }).start();
+  };
+  
+  const maxHeight = animationController.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 200]  // Adjust the maximum height according to your needs
+  });
+  
   const fetchDebts = async () => {
+    const token = await AsyncStorage.getItem('jwt_token');
+    if (!token) {
+      Alert.alert("Error", "Authentication token is missing or expired. Please login again.");
+      return;
+    }
+
     try {
-      const token = await AsyncStorage.getItem('jwt_token');
-      const sessionKey = await AsyncStorage.getItem('sessionKey');
-      if (!token || !sessionKey) {
-        Alert.alert("Error", "Authentication details are missing");
-        return;
-      }
-      
       const response = await axios.get('http://127.0.0.1:5000/total-amount', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Session-Key': sessionKey,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       setDebts(response.data);
-      setRefreshing(false);  // Reset refreshing state when data is loaded
     } catch (error) {
       Alert.alert("Error", "Failed to fetch debts: " + error.message);
-      setRefreshing(false);  // Reset refreshing state on error as well
+    }
+    setRefreshing(false);
+  };
+
+  const fetchNetAmount = async () => {
+    const token = await AsyncStorage.getItem('jwt_token');
+    try {
+      const response = await axios.get('http://127.0.0.1:5000/net_amount', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setNetAmount(response.data.total);
+    } catch (error) {
+      Alert.alert("Error", "Failed to fetch net amount: " + error.message);
     }
   };
 
   const onRefresh = () => {
     setRefreshing(true);
     fetchDebts();
+    fetchNetAmount();
   };
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={styles.debtItem}
       onPress={() => navigation.navigate('FriendsDashBoard', { friend_id: item.friend_id })}
     >
@@ -53,75 +86,101 @@ export default function Home({ navigation }) {
   );
 
   return (
-    <FlatList
-      data={debts}
-      renderItem={renderItem}
-      keyExtractor={item => item.friend_id.toString()}
-      contentContainerStyle={[styles.listContainer, { backgroundColor: '#fff' }]} 
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-        />
-      }
-      ListHeaderComponent={(
-        <TouchableOpacity 
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="dark-content" backgroundColor="black" />
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>EquiPay</Text>
+        <TouchableOpacity
           style={styles.addFriendButton}
           onPress={() => navigation.navigate('AddFriends')}
         >
           <MaterialIcons name="person-add" size={28} color="black" />
         </TouchableOpacity>
-      )}
-    />
-  );  
+      </View>
+      <TouchableOpacity style={styles.totalAmountContainer} onPress={toggleExpansion}>
+        <Text style={styles.totalNetAmountTitle}>Total:</Text>
+        <Text style={[styles.totalAmount, { color: netAmount < 0 ? 'red' : 'green' }]}>
+          {netAmount < 0 ? `-$${Math.abs(netAmount)}` : `$${netAmount}`}
+        </Text>
+      </TouchableOpacity>
+      <Animated.View style={{ maxHeight }}>
+        <FlatList
+          data={debts}
+          renderItem={renderItem}
+          keyExtractor={item => item.friend_id.toString()}
+          contentContainerStyle={styles.listContainer}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        />
+      </Animated.View>
+    </SafeAreaView>
+  );    
 }
 
 const styles = StyleSheet.create({
-  listContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingTop: 20,
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#ffffff',
   },
-  menu: {
+  header: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 10,
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    backgroundColor: '#fff',
+    borderRadius:50,
   },
-  menuButton: {
-    padding: 15,
-    margin: 10,
-    backgroundColor: '#007AFF',
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  menuText: {
-    color: '#fff',
-    fontSize: 18,
+  headerTitle: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: 'black',
   },
   addFriendButton: {
-    position: 'absolute',  // Position the button absolutely
-    bottom: 280,               // Distance from the top of its container
-    left: 160,             // Distance from the right of its container
     backgroundColor: '#fff',
     padding: 10,
     borderRadius: 30,
     borderWidth: 1,
     borderColor: '#fff',
-  },  
+  },
+  totalAmountContainer: {
+    padding: 35,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    shadowColor: '#071718',  // Sets the color of the shadow
+    shadowOffset: { width: 0, height: 1 },  // Sets the displacement of the shadow
+    shadowOpacity: 0.2,  // Sets the transparency of the shadow
+    shadowRadius: 3,  // Sets the blur radius of the shadow
+    elevation: 10,  // Adds shadow for Android
+    borderRadius:20, 
+},
+totalNetAmountTitle: {
+  fontSize: 20,
+  fontWeight: 'bold',
+  color: '#333',
+  marginBottom: 10, 
+},
+  totalAmount: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  listContainer: {
+    paddingVertical: 20,
+  },
   debtItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 10,
+    padding: 15,
     borderBottomWidth: 1,
     borderColor: '#ccc',
     width: '100%',
   },
   friendName: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#333',
   },
   amount: {
-    fontSize: 16,
-  }
+    fontSize: 18,
+  },
 });

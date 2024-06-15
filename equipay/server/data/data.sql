@@ -100,3 +100,41 @@ INSERT INTO "user" (firstname, lastname, username, password, email, session_key,
 INSERT INTO Friends (UserID, FriendUserID, Status) VALUES ('1', '11', 'accepted');
 INSERT INTO Friends (UserID, FriendUserID, Status) VALUES ('2', '11', 'accepted');
 INSERT INTO Friends (UserID, FriendUserID, Status) VALUES ('3', '11', 'accepted');
+
+-- First, insert a group
+INSERT INTO Groups (GroupName, CreatedBy)
+VALUES ('Utility Group', 11);  -- Assuming 'CreatedBy' user_id '11' exists
+
+-- Insert Expenses for May and June
+INSERT INTO Expenses (PayerID, Amount, Description, Date)
+VALUES
+(11, 500.00, 'May Utilities', '2023-05-15'),
+(11, 600.00, 'June Utilities', '2023-06-15');
+
+-- Insert corresponding Debts assuming ExpenseID 1 for May and 2 for June
+INSERT INTO Debts (ExpenseID, OwedToUserID, OwedByUserID, AmountOwed)
+VALUES
+(1, 11, 1, 166.67),
+(1, 11, 2, 166.67),
+(1, 11, 3, 166.67),
+(2, 11, 1, 200.00),
+(2, 11, 2, 200.00),
+(2, 11, 3, 200.00);
+
+-- Assuming GroupID 1 has been inserted
+-- Insert GroupExpenses for May and June for the created group
+INSERT INTO GroupExpenses (GroupID, PayerID, Amount, Description, Date)
+VALUES
+(1, 11, 500.00, 'May Group Utilities', '2023-05-15'),
+(1, 11, 600.00, 'June Group Utilities', '2023-06-15');
+
+-- Assuming ExpenseID 1 and 2 for GroupExpenses as before
+-- Insert corresponding GroupDebts
+INSERT INTO GroupDebts (ExpenseID, OwedToUserID, OwedByUserID, AmountOwed)
+VALUES
+(1, 11, 1, 166.67),
+(1, 11, 2, 166.67),
+(1, 11, 3, 166.67),
+(2, 11, 1, 200.00),
+(2, 11, 2, 200.00),
+(2, 11, 3, 200.00);
