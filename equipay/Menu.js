@@ -68,18 +68,17 @@ const Menu = ({ navigation }) => {
       const response = await axios.get('http://127.0.0.1:5000/user_group', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      // Check if the response data is valid and is an array
       if (response.data && Array.isArray(response.data)) {
         setGroups(response.data.map(group => ({
-          group_id: group.group_id.toString(), // Ensure group_id is a string
+          group_id: group.group_id.toString(), 
           group_name: group.group_name
         })));
       } else {
-        setGroups([]); // Set to an empty array if no valid data
+        setGroups([]); 
       }
     } catch (error) {
       console.error('Error fetching groups:', error);
-      setGroups([]); // Set to an empty array in case of error
+      setGroups([]);
     } finally {
       setLoading(false);
     }

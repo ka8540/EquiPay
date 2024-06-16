@@ -8,22 +8,18 @@ from db.amoutowed import get_user_id
 class UserGroupsAPI(Resource):
     @jwt_required()
     def get(self):
-        # Extract the username from the JWT token
         current_user_username = get_jwt_identity()['username']
 
-        # Retrieve the user ID based on the username, assuming a function exists to get user_id from username
         user_id = get_user_id(current_user_username)
         if not user_id:
             return make_response(jsonify({"message": "User not found"}), 404)
 
-        # Fetch groups based on the user_id
         try:
             groups = get_groups_by_user_id(user_id)
             if not groups:
                 return make_response(jsonify({"message": "No groups found"}), 201)
             return jsonify(groups)
         except Exception as e:
-            # Log the exception or handle it as needed
             print(f"Error fetching groups: {str(e)}")
             return make_response(jsonify({"error": "An error occurred while fetching groups", "details": str(e)}), 500)
     
@@ -45,9 +41,8 @@ class CreateGroupAPI(Resource):
         if group_id is None:
             return make_response(jsonify({"error": "Failed to create group"}), 400)
 
-        add_group_member(group_id, user_id, True)  # Add creator as admin
+        add_group_member(group_id, user_id, True)
 
-        # Add multiple friends as members
         if args['friend_ids']:
             for friend_id in args['friend_ids']:
                 add_group_member(group_id, friend_id, False)

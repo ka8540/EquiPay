@@ -107,5 +107,7 @@ def setup_database():
 
 if __name__ == '__main__':
     print("Starting flask")
+
     setup_database()
+    app.run(host='0.0.0.0')
     app.run(debug=True)

@@ -8,7 +8,7 @@ const Account = ({ navigation }) => {
     const [refreshing, setRefreshing] = useState(false);
 
     const fetchProfileImage = async () => {
-        setRefreshing(true); // Set refreshing to true to show the refresh indicator
+        setRefreshing(true);
         const sessionKey = await AsyncStorage.getItem('sessionKey');
         const token = await AsyncStorage.getItem('jwt_token');
         if (sessionKey && token) {
@@ -32,7 +32,7 @@ const Account = ({ navigation }) => {
                 setProfileImageUrl(null);
             }
         }
-        setRefreshing(false); // Reset refreshing state after fetching data
+        setRefreshing(false);
     };
 
     useEffect(() => {
@@ -102,13 +102,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     scrollViewContent: {
-        alignItems: 'flex-start', // Align children of ScrollView to the start
+        alignItems: 'flex-start', 
         paddingTop: 20,
     },
     item: {
         flexDirection: 'row',
         padding: 32,
-        width: '100%', // Take full width to align text and icon
+        width: '100%', 
         alignItems: 'center',
         borderBottomWidth: 2,
         borderBottomColor: '#ccc',
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     logoutButton: {
-        position: 'absolute', // Position button at the bottom
+        position: 'absolute', 
         bottom: 0,
         left: 0,
         right: 0,

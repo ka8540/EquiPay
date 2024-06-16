@@ -16,14 +16,12 @@ class DeleteGroupDebtByIdAPI(Resource):
         parser.add_argument('amount_owed', type=float, required=True, help="Amount owed cannot be blank!")
         args = parser.parse_args()  
 
-        # Get user ID from JWT token
         current_user_username = get_jwt_identity()['username']
         user_id = get_user_id(current_user_username)
 
         if not user_id:
             return make_response(jsonify({"error": "User not found"}), 404)
 
-        # Attempt to delete the debt
         success = delete_group_debt(user_id, args['friend_id'], args['amount_owed'],group_id)
         
         if success:

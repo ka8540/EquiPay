@@ -58,13 +58,10 @@ def delete_debt(user_id, friend_id, amount_owed):
     WHERE (OwedToUserID = %s AND OwedByUserID = %s AND AmountOwed = %s)
     OR (OwedToUserID = %s AND OwedByUserID = %s AND AmountOwed = %s);
     '''
-    # Execute the delete operation
     try:
-        # The exec_commit function does not return the number of affected rows, so we assume success if no exception is raised
         exec_commit(query, (user_id, friend_id, amount_owed, friend_id, user_id, amount_owed))
-        return True  # Assume success if no exceptions
+        return True  
     except Exception as e:
         print("Failed to delete debt:", e)
-        return False  # Return False if an exception occurs
- # Returns True if the deletion was successful
+        return False  
 

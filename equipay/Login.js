@@ -65,7 +65,7 @@ export default function Login({ navigation }) {
       <StatusBar style="auto" />
       <View style={styles.content}>
         <Image 
-          source={{ uri: '/Users/kayahir/Documents/EquiPay/equipay/images/Equipay.png' }}  
+          source={{ uri: 'https://profile-picture-docs.s3.amazonaws.com/Equipay.png' }}  
           style={styles.image}
         />
         <Text style={styles.header}>Login</Text>

@@ -23,6 +23,5 @@ class ListUsersApi(Resource):
             return make_response(jsonify({"message": "Invalid session key"}), 401)
         current_user = get_jwt_identity()
 
-        # If session key is valid, return the list of users excluding the current user
         return jsonify(list_info_items(username))
 

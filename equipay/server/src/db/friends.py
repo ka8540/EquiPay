@@ -76,15 +76,13 @@ def update_friend_request_status(username, friend_id, action):
 
 def add_friend_request(username, friend_id):
     try:
-        # Fetch the user ID from the database using the username
         query_user_id = '''SELECT user_id FROM "user" WHERE username = %s;'''
         user_id_tuple = exec_get_one(query_user_id, (username,))
         
         if user_id_tuple:
-            user_id = user_id_tuple[0]  # Extract the user_id from the tuple
+            user_id = user_id_tuple[0] 
             print("User_id:", user_id)
 
-            # Insert the friend request
             exec_commit("INSERT INTO Friends (UserID, FriendUserID, Status) VALUES (%s, %s, 'pending')",
                         (user_id, friend_id))
             return True

@@ -7,7 +7,7 @@ import { useRoute } from '@react-navigation/native';
 const GroupImage = ({ navigation }) => {
     const [imageUri, setImageUri] = useState(null);
     const route = useRoute();
-    const { group_id } = route.params; // Ensure that group_id is passed via navigation params
+    const { group_id } = route.params; 
 
     const pickImageAndUpload = async () => {
         const token = await AsyncStorage.getItem('jwt_token');
@@ -42,14 +42,14 @@ const GroupImage = ({ navigation }) => {
         }
 
         const localUri = firstAsset.uri;
-        setImageUri(localUri); // Update state to show the preview
+        setImageUri(localUri); 
         const filename = localUri.split('/').pop();
         const type = firstAsset.type || 'image';
 
         const formData = new FormData();
         formData.append('file', { uri: localUri, name: filename, type });
 
-        fetch(`http://127.0.0.1:5000/group_photo/${group_id}`, { // Modified to include group_id in the URL
+        fetch(`http://127.0.0.1:5000/group_photo/${group_id}`, {
             method: 'POST',
             body: formData,
             headers: {

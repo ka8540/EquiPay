@@ -4,7 +4,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AdvancedFeatures = ({ navigation }) => {
     const handleDeleteAccount = async () => {
-        // Confirm before deleting
         Alert.alert(
             "Delete Account",
             "Are you sure you want to permanently delete your account?",
@@ -43,7 +42,6 @@ const AdvancedFeatures = ({ navigation }) => {
 
             const responseData = await response.json();
             if (response.ok) {
-                // Clear session storage and perform logout
                 await AsyncStorage.clear();
                 Alert.alert("Account Deleted", "Your account has been successfully deleted.", [
                     { text: "OK", onPress: () => navigation.navigate('Login') }

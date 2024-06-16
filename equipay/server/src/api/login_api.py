@@ -18,7 +18,6 @@ class LoginAPI(Resource):
         parser.add_argument('password', type=str, required=True, location='json')
         args = parser.parse_args()
 
-        # Use the check_user_credentials function from login.py
         response, status_code = check_user_credentials(self.bcrypt, args['username'], args['password'])
         
         if status_code == 200:

@@ -20,7 +20,6 @@ const ViewProfile = ({ navigation }) => {
             }
 
             try {
-                // Fetch user data
                 const userResponse = await fetch('http://127.0.0.1:5000/accountapi', {
                     method: 'GET',
                     headers: {
@@ -47,7 +46,6 @@ const ViewProfile = ({ navigation }) => {
                     console.error("Received empty data array");
                 }
 
-                // Fetch profile image URL
                 const imageResponse = await fetch('http://127.0.0.1:5000/upload', {
                     method: 'GET',
                     headers: {
@@ -62,9 +60,9 @@ const ViewProfile = ({ navigation }) => {
 
                 const imageResult = await imageResponse.json();
                 if (imageResult.url) {
-                    setProfileImageUrl(imageResult.url[0]);  // Assuming the URL is the first element in the array
+                    setProfileImageUrl(imageResult.url[0]); 
                 } else {
-                    setProfileImageUrl(null);  // Use null for no image and handle the UI accordingly
+                    setProfileImageUrl(null);
                 }
                 setIsLoading(false);
             } catch (error) {

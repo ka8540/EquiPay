@@ -68,7 +68,7 @@ const FriendsDashboard = ({ route, navigation }) => {
   
     const postData = {
       friend_id: friend_id,
-      amount_owed: parseFloat(debt.amount_owed) // Ensure this is a number if required
+      amount_owed: parseFloat(debt.amount_owed)
     };
   
     console.log("Sending Post Data:", postData);
@@ -84,7 +84,7 @@ const FriendsDashboard = ({ route, navigation }) => {
   
       if (response.status === 200) {
         Alert.alert("Success", "Debt settled successfully");
-        fetchData();  // Refresh data
+        fetchData(); 
       } else {
         Alert.alert("Error", "Failed to settle debt: " + (response.data.error || "Unknown Error"));
       }

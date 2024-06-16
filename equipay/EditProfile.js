@@ -27,7 +27,7 @@ const EditProfile = ({ navigation }) => {
                     }
                 });
                 const data = await response.json();
-                console.log("Fetched Data", data); // Debugging to check the fetched data
+                console.log("Fetched Data", data);
                 if (response.ok && data.length > 0) {
                     const userDetails = data[0];
                     setUsername(userDetails.username);
@@ -70,7 +70,7 @@ const EditProfile = ({ navigation }) => {
             const data = await response.json();
             if (response.ok) {
                 Alert.alert("Update Success", "Profile updated successfully");
-                navigation.goBack(); // or update UI accordingly
+                navigation.goBack(); 
             } else {
                 Alert.alert("Update Error", data.message || "Failed to update profile");
             }

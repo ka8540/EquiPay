@@ -92,7 +92,7 @@ function MainAppTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        headerShown: false, // This will hide the header globally in the tab navigator
+        headerShown: false, 
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
           let iconSize = size;

@@ -22,7 +22,6 @@ class SignUpApi(Resource):
         parser.add_argument('lastname', type=str, required=True, location='json')
         args = parser.parse_args()
 
-        # Prepare user data
         user_data = {
             'username': args['username'],
             'password': args['password'],
@@ -30,7 +29,6 @@ class SignUpApi(Resource):
             'firstname': args['firstname'],
             'lastname': args['lastname']
         }
-
-        # Pass bcrypt to user_signup
+        
         response, status_code = user_signup(self.bcrypt, **user_data)
         return make_response(jsonify(response), status_code)

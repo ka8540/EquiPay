@@ -20,13 +20,10 @@ class TotalAmountAPIbyID(Resource):
         print("user_id:", user_id)
         print(f"Calculating total amount for user ID {user_id} with friend ID {friend_id}")
 
-        # Calculate total amount owed by the user to the friend
         amount_owed_by_user = calculate_amount_owed(user_id, friend_id)
 
-        # Calculate total amount owed by the friend to the user
         amount_owed_to_user = calculate_amount_owed(friend_id, user_id)
 
-        # Calculate the net amount
         net_amount = amount_owed_to_user - amount_owed_by_user
 
         if net_amount < 0:

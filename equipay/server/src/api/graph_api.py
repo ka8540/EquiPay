@@ -2,7 +2,7 @@ from flask import jsonify, request, make_response
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from db.amoutowed import get_user_id 
-from db.graph import get_graph_values  # Renamed to reflect broader usage
+from db.graph import get_graph_values 
 
 class GraphAPI(Resource):
     @jwt_required()
@@ -14,6 +14,6 @@ class GraphAPI(Resource):
         
         graph_values = get_graph_values(user_id)
         if not graph_values:
-            return make_response(jsonify({"message": "Graph data is empty"}), 404)
+            return make_response(jsonify({"message": "Graph data is empty"}), 201)
         
         return jsonify(graph_values)

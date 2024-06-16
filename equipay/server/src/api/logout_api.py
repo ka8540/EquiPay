@@ -2,10 +2,9 @@ from flask import jsonify, make_response, request
 from flask_restful import Api, Resource, reqparse
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-# Import only the necessary functions from utilities and logout db module
 try:
     from src.utilities.swen_344_db_utils import exec_commit
-    from src.db.logout import user_logout  # Assuming user_logout function handles the logout process
+    from src.db.logout import user_logout 
 except ImportError:
     from utilities.swen_344_db_utils import exec_commit
     from db.logout import user_logout

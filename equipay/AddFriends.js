@@ -75,7 +75,6 @@ const AddFriends = ({ navigation }) => {
       console.log("Response:",response);
       if (response.status === 200) {
         Alert.alert("Success", `Friend request ${action}ed successfully!`);
-        // Directly update the state without re-fetching to test isolated update logic
         setPendingRequests(prevRequests => 
           prevRequests.filter(req => req.id !== friendId)
         );
@@ -120,7 +119,7 @@ const AddFriends = ({ navigation }) => {
       });
       if (response.status === 200) {
         Alert.alert("Success", "Friend request sent successfully!");
-        fetchData(); // Refresh data after adding a friend
+        fetchData(); 
       }
     } catch ( error ) {
       if (error.response) {

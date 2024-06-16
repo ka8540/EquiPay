@@ -35,7 +35,6 @@ class GroupNameByIdAPI(Resource):
             group_name = get_groups_by_group_id(group_id)
             if not group_name:
                 return make_response(jsonify({"message": "No group name found"}), 404)
-            # Assuming group_name query returns a list of tuples
             return jsonify({"group_name": group_name[0][0]}) if group_name else make_response(jsonify({"message": "Group not found"}), 404)
         except Exception as e:
             print(f"Error fetching group name: {str(e)}")

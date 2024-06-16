@@ -5,6 +5,7 @@ import os
 def connect():
     config = {}
     yml_path = os.path.join(os.path.dirname(__file__), '../../config/db.yml') #db.yml
+    # yml_path ='config/db.yml'
     with open(yml_path, 'r') as file:
         config = yaml.load(file, Loader=yaml.FullLoader)
     return psycopg2.connect(dbname=config['database'],

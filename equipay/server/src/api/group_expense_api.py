@@ -19,10 +19,8 @@ class GroupExpenseAPI(Resource):
         print("Include Self: ", args['include_self'])
         print("Description: ", args['description'])
         
-        # Obtain the current user's identity from JWT token
         current_user_username = get_jwt_identity()['username']
         
-        # Pass the group_id from the URL to the expense splitting function
         result = split_group_expense(current_user_username, group_id, args['amount'], args['friend_ids'], args['include_self'], args['description'])
         if result:
             return make_response(jsonify({"message": "Expense split successfully."}), 200)

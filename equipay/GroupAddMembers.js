@@ -27,10 +27,10 @@ const GroupAddMembers = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("Fetched friends:", response.data); // Verify the data structure
+      console.log("Fetched friends:", response.data); 
       const transformedFriends = response.data.map(friend => ({
-        id: friend[0].toString(), // Assuming the ID is the first element
-        name: friend[1], // Assuming the name is the second element
+        id: friend[0].toString(), 
+        name: friend[1], 
       }));
       console.log("Transformed friends:", transformedFriends);
       setFriends(transformedFriends);

@@ -41,7 +41,7 @@ const ImageUploader = ({navigation}) => {
         }
 
         const localUri = firstAsset.uri;
-        setImageUri(localUri); // Update state to show the preview
+        setImageUri(localUri); 
         const filename = localUri.split('/').pop();
         const type = firstAsset.type || 'image';
 

@@ -45,7 +45,7 @@ const Group = () => {
 
   const onRefresh = () => {
     setRefreshing(true);
-    fetchGroups();  // Call your API fetch function here
+    fetchGroups();  
   };
 
   return (
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     marginBottom: 20,
-    marginTop: 50, // Increased margin-top to push the header down
+    marginTop: 50, 
   },
   groupItem: {
     padding: 10,
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderWidth: 1,
     borderRadius: 5,
-    marginTop: 15, // Increased margin-top for each group item to space them further from the header
+    marginTop: 15,
   },
   groupText: {
     fontSize: 16,
