@@ -11,7 +11,7 @@ import Account from './Account';
 import Menu from './Menu';
 import AddItem from './Add';
 import Group from './Group';
-import Activity from './Activity.Js';
+import Activity from './UserActivity.js';
 import ViewProfile from './ViewProfile';
 import ChangePassword from './ChangePassword';
 import AdvancedFeatures from './AdvancedFeatures';

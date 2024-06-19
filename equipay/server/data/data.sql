@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS Groups CASCADE;
 DROP TABLE IF EXISTS GroupMembers CASCADE;
 DROP TABLE IF EXISTS GroupExpenses CASCADE;
 DROP TABLE IF EXISTS GroupDebts CASCADE;
-
+DROP TABLE IF EXISTS ActivityLog CASCADE;
 
 -- Create Users Table
 CREATE TABLE "user" (
@@ -81,6 +81,14 @@ CREATE TABLE GroupDebts (
     OwedToUserID INT REFERENCES "user"(user_id),
     OwedByUserID INT REFERENCES "user"(user_id),
     AmountOwed DECIMAL(10, 2) NOT NULL
+);
+
+CREATE TABLE ActivityLog (
+    LogID SERIAL PRIMARY KEY,
+    UserID INT REFERENCES "user"(user_id),
+    ActionType VARCHAR(255) NOT NULL,
+    Details VARCHAR(255),
+    Timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 

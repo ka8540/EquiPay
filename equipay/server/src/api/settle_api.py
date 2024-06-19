@@ -6,7 +6,8 @@ from botocore.exceptions import NoCredentialsError
 import werkzeug
 from db.amoutowed import get_user_id
 from db.amoutowed import get_debts_by_friend, delete_debt
-
+from utilities.swen_344_db_utils import exec_commit
+from db.activity import get_firstname_by_id
 class DebtsByFriendAPI(Resource):
     @jwt_required()
     def get(self, friend_id):
@@ -32,13 +33,22 @@ class DeleteDebtAPI(Resource):
 
         current_user_username = get_jwt_identity()['username']
         user_id = get_user_id(current_user_username)
-
+        firstname = get_firstname_by_id(user_id)
         if not user_id:
             return make_response(jsonify({"error": "User not found"}), 404)
 
-        success = delete_debt(user_id, args['friend_id'], args['amount_owed'])
+        friend_user_id = args['friend_id']
+        amount_owed = args['amount_owed']
+
+        friend_name = get_firstname_by_id(friend_user_id)
+
+        success = delete_debt(user_id, friend_user_id, amount_owed)
         
         if success:
+            log_details = f"{firstname} has settled up with {friend_name} with amount ${amount_owed:.2f}."
+            log_sql = "INSERT INTO ActivityLog (UserID, ActionType, Details) VALUES (%s, %s, %s)"
+            exec_commit(log_sql, (user_id, 'Settled Debt', log_details))
+
             return make_response(jsonify({"message": "Debt record deleted successfully"}), 200)
         else:
             return make_response(jsonify({"error": "Failed to delete debt record"}), 400)

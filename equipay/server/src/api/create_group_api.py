@@ -4,6 +4,8 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 import werkzeug
 from db.group import get_groups_by_user_id, create_group, add_group_member
 from db.amoutowed import get_user_id
+from utilities.swen_344_db_utils import exec_commit
+from db.activity import get_firstname_by_id
 
 class UserGroupsAPI(Resource):
     @jwt_required()
@@ -34,6 +36,7 @@ class CreateGroupAPI(Resource):
 
         current_user_username = get_jwt_identity()['username']
         user_id = get_user_id(current_user_username)
+        firstname = get_firstname_by_id(user_id)
         if not user_id:
             return make_response(jsonify({"error": "User not found"}), 404)
 
@@ -41,11 +44,19 @@ class CreateGroupAPI(Resource):
         if group_id is None:
             return make_response(jsonify({"error": "Failed to create group"}), 400)
 
+        log_details = f"{firstname} created the group '{args['group_name']}'."
+        exec_commit("INSERT INTO ActivityLog (UserID, ActionType, Details) VALUES (%s, %s, %s)", 
+                    (user_id, 'Created Group', log_details))
+
         add_group_member(group_id, user_id, True)
 
         if args['friend_ids']:
             for friend_id in args['friend_ids']:
                 add_group_member(group_id, friend_id, False)
+                friend_firstname = get_firstname_by_id(friend_id)
+                friend_log_details = f"{friend_firstname} was added to the group '{args['group_name']}' by {current_user_username}."
+                exec_commit("INSERT INTO ActivityLog (UserID, ActionType, Details) VALUES (%s, %s, %s)", 
+                            (friend_id, 'Added to Group', friend_log_details))
 
         return make_response(jsonify({"message": "Group created successfully", "group_id": group_id}), 200)
     
