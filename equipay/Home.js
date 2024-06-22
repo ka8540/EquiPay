@@ -6,6 +6,7 @@ import axios from 'axios';
 import { LineChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
 import Speedometer from 'react-native-speedometer-chart';
+import moment from 'moment';
 
 const MySpeedometer = ({ netAmount = 0 }) => {
   const getStatusText = (amount) => {
@@ -118,18 +119,21 @@ export default function Home({ navigation }) {
       const response = await axios.get('http://127.0.0.1:5000/graph_values', {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+      console.log("Response:", response.data);
       if (response.status === 201 || !response.data || response.data.length === 0) {
         setGraphData({
           labels: ["Start", "End"],
           datasets: [{ data: [0, 0] }]
         });
       } else {
-        const labels = response.data.map(item => {
-          const date = new Date(item[1]);
-          return date.toLocaleDateString("en-US", { month: 'short', day: 'numeric' });
-        });
-        const data = response.data.map(item => parseFloat(item[0]));
+        let dataPoints = response.data.map(item => ({
+          value: parseFloat(item[0]),
+          date: moment(item[1], 'ddd, DD MMM YYYY HH:mm:ss GMT').format('MMM D') // Adjusted date format
+        }));
+  
+        let labels = dataPoints.map(point => point.date);
+        let data = dataPoints.map(point => point.value);
+  
         setGraphData({
           labels,
           datasets: [{ data }]
@@ -140,6 +144,7 @@ export default function Home({ navigation }) {
       Alert.alert("Error", "Failed to fetch graph data: " + (error.response ? error.response.data.message : error.message));
     }
   };
+  
 
   const renderItem = ({ item }) => (
     <TouchableOpacity

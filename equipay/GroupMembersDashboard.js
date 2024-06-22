@@ -33,7 +33,7 @@ const loadData = async () => {
   await fetchGroupName(group_id);
   await fetchGroupImage(group_id);
   await fetchGroupMembers(group_id);
-  await fetchExpenses();  // Add this line to fetch expenses
+  await fetchExpenses();  
   setRefreshing(false);
 };
 

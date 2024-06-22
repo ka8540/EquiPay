@@ -28,7 +28,6 @@ class DeleteDebtAPI(Resource):
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('friend_id', type=int, required=True, help="Friend ID cannot be blank!")
-        parser.add_argument('amount_owed', type=float, required=True, help="Amount owed cannot be blank!")
         args = parser.parse_args()  
 
         current_user_username = get_jwt_identity()['username']
@@ -38,14 +37,12 @@ class DeleteDebtAPI(Resource):
             return make_response(jsonify({"error": "User not found"}), 404)
 
         friend_user_id = args['friend_id']
-        amount_owed = args['amount_owed']
 
         friend_name = get_firstname_by_id(friend_user_id)
 
-        success = delete_debt(user_id, friend_user_id, amount_owed)
-        
+        success = delete_debt(user_id, friend_user_id)
         if success:
-            log_details = f"{firstname} has settled up with {friend_name} with amount ${amount_owed:.2f}."
+            log_details = f"{firstname} has settled up with {friend_name}."
             log_sql = "INSERT INTO ActivityLog (UserID, ActionType, Details) VALUES (%s, %s, %s)"
             exec_commit(log_sql, (user_id, 'Settled Debt', log_details))
 

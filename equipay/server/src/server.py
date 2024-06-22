@@ -33,6 +33,7 @@ try:
     from api.total_amount_pending import NetAmountOwedAPI
     from api.graph_api import GraphAPI
     from api.activity_api import ActivityAPI
+    from api.account_api import FriendNameAPI
 except ImportError:
     from utilities.swen_344_db_utils import exec_sql_file
     from api.login_api import LoginAPI
@@ -62,6 +63,7 @@ except ImportError:
     from api.total_amount_pending import NetAmountOwedAPI
     from api.graph_api import GraphAPI
     from api.activity_api import ActivityAPI
+    from api.account_api import FriendNameAPI
 
 app = Flask(__name__)
 CORS(app)
@@ -103,6 +105,7 @@ api.add_resource(GroupExpensesListAPI, '/group_expenselist/<int:group_id>')
 api.add_resource(NetAmountOwedAPI, '/net_amount')
 api.add_resource(GraphAPI, '/graph_values')
 api.add_resource(ActivityAPI, '/activity')
+api.add_resource(FriendNameAPI, '/friend_name/<int:friend_id>')
 
 def setup_database():
     print("Loading db")
@@ -110,6 +113,5 @@ def setup_database():
 
 if __name__ == '__main__':
     print("Starting flask")
-
     setup_database()
     app.run(debug=True)

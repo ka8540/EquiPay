@@ -2,7 +2,8 @@ from flask import jsonify, make_response, request
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_bcrypt import Bcrypt
-
+from db.amoutowed import get_user_id
+from db.activity import get_firstname_by_id
 try:
     from src.db.user_details import update_user_detail, list_user_detail
     from src.model.user import get_username
@@ -50,3 +51,24 @@ class AccountApi(Resource):
             return jsonify({"message": "User details updated successfully"})
         else:
             return make_response(jsonify({"message": "Failed to update user details"}), 500)
+
+
+class FriendNameAPI(Resource):
+    @jwt_required()
+    def get(self, friend_id):
+        jwt_user = get_jwt_identity()
+        user_id = get_user_id(jwt_user['username'])
+
+        if not user_id:
+            return make_response(jsonify({"error": "User not found"}), 404)
+
+        friend_name = get_firstname_by_id(friend_id)  
+        if not friend_name:
+            return make_response(jsonify({"error": "No Name Found"}), 404)
+
+        return jsonify({"friend_name": friend_name})
+        
+
+        
+
+

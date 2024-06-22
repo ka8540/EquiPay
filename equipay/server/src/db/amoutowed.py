@@ -39,27 +39,28 @@ def get_user_debts(user_id):
 
 def get_debts_by_friend(user_id, friend_id):
     query = """
-    SELECT d.AmountOwed, e.Description
+    SELECT d.AmountOwed, e.Description, e.Date
     FROM Debts d
     JOIN Expenses e ON d.ExpenseID = e.ExpenseID
-    WHERE d.OwedToUserID = %s AND d.OwedByUserID = %s;
+    WHERE (d.OwedToUserID = %s AND d.OwedByUserID = %s)
+    or (d.OwedToUserID = %s AND d.OwedByUserID = %s);
     """
-    results = exec_get_all(query, (user_id, friend_id))
-    debts = [{'amount_owed': debt[0], 'description': debt[1]} for debt in results]
+    results = exec_get_all(query, (user_id, friend_id, friend_id, user_id))
+    debts = [{'amount_owed': debt[0], 'description': debt[1], 'date': debt[2]} for debt in results]
+    print("Debts:",debts)
     return debts
 
-def delete_debt(user_id, friend_id, amount_owed):
+def delete_debt(user_id, friend_id):
     print("Inside the Delete Debt")
     print("user_id:", user_id)
     print("friend_id:", friend_id)
-    print("amount_owed:", amount_owed)
     query = '''
     DELETE FROM Debts
-    WHERE (OwedToUserID = %s AND OwedByUserID = %s AND AmountOwed = %s)
-    OR (OwedToUserID = %s AND OwedByUserID = %s AND AmountOwed = %s);
+    WHERE (OwedToUserID = %s AND OwedByUserID = %s)
+    OR (OwedToUserID = %s AND OwedByUserID = %s);
     '''
     try:
-        exec_commit(query, (user_id, friend_id, amount_owed, friend_id, user_id, amount_owed))
+        exec_commit(query, (user_id, friend_id,friend_id, user_id,))
         return True  
     except Exception as e:
         print("Failed to delete debt:", e)
