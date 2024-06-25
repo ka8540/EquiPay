@@ -39,6 +39,4 @@ package-lock.json
 
 /Users/kayahir/Documents/EquiPay/node_modules/
 
-server/server-deployment.yaml
-server/server-service.yaml
 server/aws-secret.yaml
