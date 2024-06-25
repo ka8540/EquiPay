@@ -4,6 +4,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { SectionList } from 'react-native';
 
 const FriendsDashboard = () => {
   const navigation = useNavigation();
@@ -39,24 +40,34 @@ const FriendsDashboard = () => {
   
     try {
       const responses = await Promise.all([
-        axios.get(`http://127.0.0.1:5000/total-amount/${friend_id}`, { headers: { Authorization: `Bearer ${token}`, 'Session-Key': sessionKey }}),
-        axios.get(`http://127.0.0.1:5000/friend-profile-picture/${friend_id}`, { headers: { Authorization: `Bearer ${token}`, 'Session-Key': sessionKey }}),
-        axios.get(`http://127.0.0.1:5000/debts-by-friend/${friend_id}`, { headers: { Authorization: `Bearer ${token}`, 'Session-Key': sessionKey }}),
-        axios.get(`http://127.0.0.1:5000/friend_name/${friend_id}`, { headers: { Authorization: `Bearer ${token}`, 'Session-Key': sessionKey }})
+        axios.get(`http://192.168.0.137:5000/total-amount/${friend_id}`, { headers: { Authorization: `Bearer ${token}`, 'Session-Key': sessionKey }}),
+        axios.get(`http://192.168.0.137:5000/friend-profile-picture/${friend_id}`, { headers: { Authorization: `Bearer ${token}`, 'Session-Key': sessionKey }}),
+        axios.get(`http://192.168.0.137:5000/debts-by-friend/${friend_id}`, { headers: { Authorization: `Bearer ${token}`, 'Session-Key': sessionKey }}),
+        axios.get(`http://192.168.0.137:5000/friend_name/${friend_id}`, { headers: { Authorization: `Bearer ${token}`, 'Session-Key': sessionKey }})
       ]);
   
       const [amountResponse, profilePicResponse, debtsResponse, nameResponse] = responses;
   
-      const sortedDebts = debtsResponse.data.sort((a, b) => new Date(a.date) - new Date(b.date)).map(debt => ({
-        ...debt,
-        date: formatDate(debt.date) // Apply the formatting here
-      }));
+      let debtsGroupedByMonth = {};
+      if (debtsResponse.status === 200 && debtsResponse.data && debtsResponse.data.length > 0) {
+        debtsResponse.data.forEach(debt => {
+          const date = new Date(debt.date);
+          const monthYear = `${date.toLocaleString('default', { month: 'long' })} ${date.getFullYear()}`;
+          if (!debtsGroupedByMonth[monthYear]) {
+            debtsGroupedByMonth[monthYear] = [];
+          }
+          debtsGroupedByMonth[monthYear].push({
+            ...debt,
+            date: formatDate(debt.date) // Store the formatted date
+          });
+        });
+      }
   
       setProfile({
-        name: nameResponse.data.friend_name || 'Name Not Found', // Use the name from the new API or fallback to a default
-        netAmount: amountResponse.data.net_amount,
-        profilePicUrl: profilePicResponse.data.url || null,
-        debts: sortedDebts
+        name: nameResponse.data && nameResponse.data.friend_name ? nameResponse.data.friend_name : 'Name Not Found', 
+        netAmount: amountResponse.data && amountResponse.data.net_amount ? amountResponse.data.net_amount : 0,
+        profilePicUrl: profilePicResponse.data && profilePicResponse.data.url ? profilePicResponse.data.url : null,
+        debts: debtsGroupedByMonth
       });
     } catch (error) {
       console.error("Error fetching profile data:", error);
@@ -64,11 +75,19 @@ const FriendsDashboard = () => {
     }
   };
   
-  
+
+  const getMonthFromDebts = () => {
+    if (profile.debts.length > 0) {
+      const firstDebtDate = new Date(profile.debts[0].originalDate); // Use the original date
+      console.log("Date:", firstDebtDate);
+      return firstDebtDate.toLocaleString('default', { month: 'long' });
+    }
+    return ''; // Return empty string or some default value if no debts
+  }
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return `${date.toLocaleString('default', { month: 'short' })} ${date.getDate()}`; // Example: Jun 15
+    return `${date.toLocaleString('default', { month: 'short' })} ${date.getDate()}`; 
   };
   
   const handleDebtSettlement = async () => {
@@ -79,7 +98,7 @@ const FriendsDashboard = () => {
       return;
     }
     try {
-      const response = await axios.post('http://127.0.0.1:5000/delete-debt', { friend_id }, {
+      const response = await axios.post('http://192.168.0.137:5000/delete-debt', { friend_id }, {
         headers: { Authorization: `Bearer ${token}`, 'Session-Key': sessionKey, 'Content-Type': 'application/json' }
       });
       if (response.status === 200) {
@@ -101,14 +120,20 @@ const FriendsDashboard = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
+        <View style={styles.profileContainer}>
         {profile.profilePicUrl ? (
-          <Image source={{ uri: profile.profilePicUrl }} style={styles.profilePic} />
-        ) : (
-          <View style={[styles.profilePic, styles.profilePicPlaceholder]}>
-            <MaterialCommunityIcons name="account" size={50} color="#fff" />
-          </View>
-        )}
-        <Text style={styles.name}>{profile.name}</Text>
+            <Image source={{ uri: profile.profilePicUrl }} style={styles.profilePic} />
+          ) : (
+            <View style={styles.profilePicPlaceholder}>
+              <MaterialCommunityIcons name="account" size={50} color="#fff" />
+            </View>
+          )}
+          <Text style={styles.name}>{profile.name}</Text>
+        </View>
+        <View style={styles.horizontalLine}></View>
+        <TouchableOpacity onPress={handleDebtSettlement} style={styles.settleButton}>
+          <Text style={styles.settleButtonText}>Settle Up</Text>
+        </TouchableOpacity>
       </View>
       <Text style={{
         color: profile.netAmount < 0 ? 'red' : 'green',
@@ -119,23 +144,26 @@ const FriendsDashboard = () => {
       }}>
         {profile.netAmount < 0 ? `You owe $${Math.abs(profile.netAmount)}` : `You are owed $${profile.netAmount}`}
       </Text>
-
-      <TouchableOpacity onPress={handleDebtSettlement} style={styles.settleButton}>
-        <Text style={styles.settleButtonText}>Settle All Debts</Text>
-      </TouchableOpacity>
-      <FlatList
-        data={profile.debts}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.debtItem}>
-            <Text style={styles.debtDescription}>{item.description} - ${item.amount_owed}</Text>
-            <Text style={styles.debtDate}>{item.date}</Text>
-          </View>
-        )}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      />
+      <SectionList
+          sections={Object.keys(profile.debts).map((month, idx) => ({
+            title: month, 
+            data: profile.debts[month]
+          }))}
+          keyExtractor={(item, index) => `item-${index}`}
+          renderItem={({ item, index }) => {
+            console.log(`Rendering item with key: item-${index}, ID: ${item.id}`);
+            return (
+              <View style={styles.debtItem}>
+                <Text style={styles.debtDescription}>{item.description} - ${item.amount_owed}</Text>
+                <Text style={styles.debtDate}>{item.date}</Text>
+              </View>
+            );
+          }}
+          renderSectionHeader={({ section: { title } }) => (
+            <Text style={styles.monthTitle}>{title}</Text>
+          )}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        />
     </View>
   );
 };
@@ -143,49 +171,57 @@ const FriendsDashboard = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f7f7f7', // Lighter background color
+    backgroundColor: '#f7f7f7',
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
     padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e1e1e1', // Softer border color
     backgroundColor: '#ffffff',
+    alignItems: 'flex-start', // Align items to the left
+    width: '100%', // Make sure the header spans the full width
+  },
+  profileContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start', // Ensures content aligns to the left
+    width: '100%', // Ensures the container spans the full width
+    marginBottom: 15,
   },
   profilePic: {
-    width: 120, // Larger profile picture
-    height: 120,
+    width: 100,
+    height: 100,
     borderRadius: 60,
     borderWidth: 4,
-    borderColor: '#007bff', // Brighter border color
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 4,
+    borderColor: '#007bff',
+    marginLeft: 0, // Adjust if more left spacing is needed
   },
   profilePicPlaceholder: {
-    width: 120,
-    height: 120,
+    width: 100,
+    height: 100,
     borderRadius: 60,
     backgroundColor: '#007bff',
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 4,
+    borderColor: '#007bff',
+    overflow: 'hidden',
+    marginLeft: 0, // Keep consistent with profilePic
   },
   name: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
-    flex: 1,
-    textAlign: 'center',
-    marginHorizontal: 10, // Added margin for better spacing
+    marginLeft: 80, // Space between the picture and the name
+  },
+  horizontalLine: {
+    width: '100%',
+    height: 1,
+    backgroundColor: '#d3d3d3',
+    marginBottom: 10,  
   },
   debtItem: {
     padding: 20,
     backgroundColor: '#fff',
-    borderBottomWidth: 0, // Removed border
+    borderBottomWidth: 0, 
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -197,29 +233,54 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 3.84,
     elevation: 3,
-    marginBottom: 5, // Space between items
+    marginBottom: 5, 
   },
   debtDescription: {
     fontSize: 18,
     color: '#333',
   },
   settleButton: {
-    backgroundColor: '#007bff', // Consider using a gradient here
-    padding: 15,
-    marginVertical: 20,
-    alignItems: 'center',
-    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: '#007bff',
+    borderRadius: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    width: 92,
+    height: 30,
+    alignSelf: 'center',  // This centers the button in the available space
+    marginTop: 5,
+    position:'relative',
+    right:150,  // Adds some space from the top element
   },
   settleButtonText: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#fff',
     fontWeight: 'bold',
-  }
+    textAlign: 'center',  // Center text inside the button
+  },
+monthDisplay: {
+  fontSize: 18,
+  fontWeight: 'bold',
+  color: '#555',
+  textAlign: 'left',
+  marginBottom: 10,
+  marginLeft:10,
+},
+monthTitle: {
+  fontSize: 18,
+  fontWeight: 'bold',
+  backgroundColor: '#f7f7f7',
+  color: '#000',
+  paddingTop: 2,
+  paddingLeft: 10,
+  paddingRight: 10,
+  paddingBottom: 2,
+}
+
 });
 
 
