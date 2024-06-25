@@ -9,6 +9,8 @@ import Speedometer from 'react-native-speedometer-chart';
 import moment from 'moment';
 
 const MySpeedometer = ({ netAmount = 0 }) => {
+  const absoluteAmount = Math.abs(netAmount); // Ensure the amount is always positive
+
   const getStatusText = (amount) => {
     if (amount > 400) return "Spending too much";
     if (amount > 70) return "Warning: High spending";
@@ -24,22 +26,23 @@ const MySpeedometer = ({ netAmount = 0 }) => {
   return (
     <View style={styles.speedometerContainer}>
       <Speedometer
-        value={Number(netAmount)} 
+        value={absoluteAmount}
         totalValue={1000}
         size={250}
         outerColor="#d3d3d3"
-        internalColor={netAmount > 400 ? 'red' : netAmount > 70 ? 'orange' : 'green'}
+        internalColor={absoluteAmount > 400 ? 'red' : absoluteAmount > 70 ? 'orange' : 'green'}
         showIndicator
         needleSharpness={1}
         indicatorColor="black"
         segments={3}
-        segmentColors={getSegmentColors(netAmount)}
+        segmentColors={getSegmentColors(absoluteAmount)}
         labelFormatter={(value) => `${value}%`}
       />
-      <Text style={styles.speedometerText}>{getStatusText(netAmount)}</Text>
+      <Text style={styles.speedometerText}>{getStatusText(absoluteAmount)}</Text>
     </View>
   );
 };
+
 
 export default function Home({ navigation }) {
   const [debts, setDebts] = useState([]);
@@ -86,6 +89,8 @@ export default function Home({ navigation }) {
       const response = await axios.get('http://127.0.0.1:5000/total-amount', {
         headers: { Authorization: `Bearer ${token}` },
       });
+      console.log("Token:",token);
+      console.log("Response:",response);
       setDebts(response.data);
     } catch (error) {
       Alert.alert("Error", "Failed to fetch debts: " + error.message);
@@ -95,6 +100,7 @@ export default function Home({ navigation }) {
 
   const fetchNetAmount = async () => {
     const token = await AsyncStorage.getItem('jwt_token');
+    console.log("Token:",token);
     try {
       const response = await axios.get('http://127.0.0.1:5000/net_amount', {
         headers: { Authorization: `Bearer ${token}` },
@@ -111,6 +117,7 @@ export default function Home({ navigation }) {
     setRefreshing(true);
     fetchDebts();
     fetchNetAmount();
+    fetchGraphData();
   };
 
   const fetchGraphData = async () => {
@@ -128,12 +135,23 @@ export default function Home({ navigation }) {
       } else {
         let dataPoints = response.data.map(item => ({
           value: parseFloat(item[0]),
-          date: moment(item[1], 'ddd, DD MMM YYYY HH:mm:ss GMT').format('MMM D') // Adjusted date format
+          date: moment(item[1], 'ddd, DD MMM YYYY HH:mm:ss GMT').format('YYYY-MM-DD') // Use a uniform date format for grouping
         }));
-  
-        let labels = dataPoints.map(point => point.date);
-        let data = dataPoints.map(point => point.value);
-  
+
+        // Group and sum values by date
+        const totalsByDate = dataPoints.reduce((acc, point) => {
+          acc[point.date] = acc[point.date] || 0;
+          acc[point.date] += point.value;
+          return acc;
+        }, {});
+
+        // Convert the object back to arrays for labels and data
+        const sortedDates = Object.keys(totalsByDate).sort();
+        const labels = sortedDates.map(date => moment(date, 'YYYY-MM-DD').format('MMM D'));
+        const data = sortedDates.map(date => totalsByDate[date]);
+
+        console.log("Aggregated Data Points:", { labels, data });
+
         setGraphData({
           labels,
           datasets: [{ data }]
@@ -143,7 +161,9 @@ export default function Home({ navigation }) {
       console.error("Error fetching graph data: ", error);
       Alert.alert("Error", "Failed to fetch graph data: " + (error.response ? error.response.data.message : error.message));
     }
-  };
+};
+
+  
   
 
   const renderItem = ({ item }) => (
@@ -241,10 +261,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 15,
+    paddingVertical: 10,
     paddingHorizontal: 10,
     backgroundColor: '#fff',
     borderRadius:50,
+    position:'static',
   },
   headerTitle: {
     fontSize: 26,
