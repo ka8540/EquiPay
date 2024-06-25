@@ -1,3 +1,4 @@
+from datetime import timedelta
 from flask import jsonify, make_response
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import create_access_token
@@ -21,7 +22,9 @@ class LoginAPI(Resource):
         response, status_code = check_user_credentials(self.bcrypt, args['username'], args['password'])
         
         if status_code == 200:
-            access_token = create_access_token(identity={"username": args['username'], "session_key": response['sessionKey']})
+            # Set token to expire in 24 hours
+            expires = timedelta(hours=24)
+            access_token = create_access_token(identity={"username": args['username'], "session_key": response['sessionKey']}, expires_delta=expires)
             return make_response(jsonify(access_token=access_token, sessionKey=response['sessionKey']), 200)
         else:
             return make_response(jsonify(response), status_code)
