@@ -4,4 +4,4 @@
 package.json 
 package-lock.json
 
-server/aws-secret.yml
+server/aws-secret.yaml
