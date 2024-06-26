@@ -1,1 +1,3 @@
-server/aws-secret.yaml
+equipay/server/aws-secret.yaml
+equipay/server/server-deployment.yaml
+equipay/server/server-service.yaml
