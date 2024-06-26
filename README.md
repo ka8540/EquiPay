@@ -104,5 +104,3 @@ EquiPay leverages a robust stack of modern technologies to provide a seamless an
 - **Orchestration and Scaling**: Employing **AWS Kubernetes** with a LoadBalancer to manage containerized application deployment, ensuring scalability and resilience.
 
 This combination of technologies ensures that EquiPay can handle complex operations efficiently, from user management to real-time data processing and analytics.
-
-##Thank-you
