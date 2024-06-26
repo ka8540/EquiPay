@@ -91,3 +91,16 @@ Each feature is designed to offer a comprehensive solution for managing shared e
   ![Login Page](equipay/images/LoginPage.PNG)
 
 This overview provides a comprehensive guide to the functionality and layout of each page within the application, aiding users and developers in navigating and understanding the software.
+
+## Technology Stack
+
+EquiPay leverages a robust stack of modern technologies to provide a seamless and efficient user experience:
+
+- **Frontend**: Developed with **React Native**, offering a responsive and intuitive interface across various mobile platforms.
+- **Backend API**: Powered by **Python Flask**, this RESTful API ensures reliable data handling and integration between the frontend and database layers.
+- **Database**: Utilizes **AWS PostgreSQL RDS** for secure and scalable data storage, ensuring high availability and performance.
+- **Document Processing**: Integrates **AWS Textract** for advanced text extraction from images, aiding in automated data entry from uploaded receipts.
+- **Image Storage**: Uses **AWS S3** for secure and durable storage of images and documents, allowing efficient retrieval and management.
+- **Orchestration and Scaling**: Employing **AWS Kubernetes** with a LoadBalancer to manage containerized application deployment, ensuring scalability and resilience.
+
+This combination of technologies ensures that EquiPay can handle complex operations efficiently, from user management to real-time data processing and analytics.
