@@ -1,0 +1,52 @@
+name: Python application
+
+on:
+  push:
+    branches: 
+      - "*"  # Run on all branches for any push events
+  pull_request:
+    branches: 
+      - "*"  # Run on all branches for any pull request events
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: SWEN732
+          POSTGRES_PASSWORD: kl,.
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r equipay/server/requirements.txt
+      - name: Set PYTHONPATH
+        run: echo "PYTHONPATH=${{ github.workspace }}/equipay/server/src" >> $GITHUB_ENV
+
+      - name: Set FLASK_APP environment variable
+        run: echo "FLASK_APP=src/server.py" >> $GITHUB_ENV
+      
+      - name: List files in the src directory
+        run: ls -alh
+        working-directory: ${{ github.workspace }}/equipay/server/src
+        
+      - name: Start Flask server
+        run: flask run --host=0.0.0.0 &
+        env:
+          FLASK_ENV: development
+        working-directory: ${{ github.workspace }}/equipay/server/src
+      - name: Delay for Flask server to start
+        run: sleep 5
