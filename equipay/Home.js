@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, RefreshControl, StatusBar, SafeAreaView, Animated, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, RefreshControl, StatusBar, SafeAreaView, Animated, ScrollView , Image} from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -86,7 +86,7 @@ export default function Home({ navigation }) {
     }
 
     try {
-      const response = await axios.get('http://127.0.0.1:5000/total-amount', {
+      const response = await axios.get('http://192.168.0.137:31000/total-amount', {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log("Token:",token);
@@ -102,7 +102,7 @@ export default function Home({ navigation }) {
     const token = await AsyncStorage.getItem('jwt_token');
     console.log("Token:",token);
     try {
-      const response = await axios.get('http://127.0.0.1:5000/net_amount', {
+      const response = await axios.get('http://192.168.0.137:31000/net_amount', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setNetAmount(Number(response.data.total)); 
@@ -123,7 +123,7 @@ export default function Home({ navigation }) {
   const fetchGraphData = async () => {
     const token = await AsyncStorage.getItem('jwt_token');
     try {
-      const response = await axios.get('http://127.0.0.1:5000/graph_values', {
+      const response = await axios.get('http://192.168.0.137:31000/graph_values', {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log("Response:", response.data);
@@ -184,7 +184,16 @@ export default function Home({ navigation }) {
         ListHeaderComponent={
           <>
             <View style={styles.header}>
-              <Text style={styles.headerTitle}>EquiPay</Text>
+            <TouchableOpacity onPress={onRefresh}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Image
+                  source={{ uri: 'https://profile-picture-docs.s3.amazonaws.com/LogoRemade-2.png' }}
+                  style={{ width: 46, height: 40, borderRadius: 60 }}
+                />
+              </View>
+            </TouchableOpacity>
+
+
               <TouchableOpacity
                 style={styles.addFriendButton}
                 onPress={() => navigation.navigate('AddFriends')}

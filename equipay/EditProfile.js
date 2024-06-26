@@ -18,7 +18,7 @@ const EditProfile = ({ navigation }) => {
                 return;
             }
             try {
-                const response = await fetch('http://127.0.0.1:5000/accountapi', {
+                const response = await fetch('http://192.168.0.137:31000/accountapi', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -53,7 +53,7 @@ const EditProfile = ({ navigation }) => {
             return;
         }
         try {
-            const response = await fetch('http://127.0.0.1:5000/accountapi', {
+            const response = await fetch('http://192.168.0.137:31000/accountapi', {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -83,24 +83,28 @@ const EditProfile = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Edit Profile</Text>
+            <Text style={styles.profileText}>Username</Text>
             <TextInput
                 style={styles.input}
                 value={username}
                 onChangeText={setUsername}
                 editable={editable}
             />
+            <Text style={styles.profileText}>Firstname</Text>
             <TextInput
                 style={styles.input}
                 value={firstName}
                 onChangeText={setFirstName}
                 editable={editable}
             />
+            <Text style={styles.profileText}>Lastname</Text>
             <TextInput
                 style={styles.input}
                 value={lastName}
                 onChangeText={setLastName}
                 editable={editable}
             />
+            <Text style={styles.profileText2}>Email</Text>
             <TextInput
                 style={styles.input}
                 value={email}
@@ -146,14 +150,23 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff'
     },
     button: {
+        width: '100%',
+        padding: 15,
+        borderRadius: 5,
+        alignItems: 'center',
+        backgroundColor: '#00EED0',
         marginTop: 10,
-        backgroundColor: '#00aaff',
-        padding: 10,
-        borderRadius: 5
     },
     buttonText: {
+        fontSize: 18,
         color: '#fff',
-        fontSize: 18
+        fontWeight: 'bold'
+    },
+    profileText:{
+      marginRight:300,
+    },
+    profileText2:{
+      marginRight:320,
     }
 });
 

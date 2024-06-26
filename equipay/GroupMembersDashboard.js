@@ -57,7 +57,7 @@ const loadData = async () => {
     }
 
     try {
-        const response = await axios.get(`http://127.0.0.1:5000/group_expenselist/${group_id}`, {
+        const response = await axios.get(`http://192.168.0.137:31000/group_expenselist/${group_id}`, {
             headers: { Authorization: `Bearer ${token}` }
         });
         setExpenses(response.data);
@@ -70,7 +70,7 @@ const loadData = async () => {
   const fetchGroupName = async (groupId) => {
     const token = await AsyncStorage.getItem('jwt_token');
     try {
-      const response = await axios.get(`http://127.0.0.1:5000/group_name/${groupId}`, {
+      const response = await axios.get(`http://192.168.0.137:31000/group_name/${groupId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setGroupName(response.data.group_name);
@@ -82,7 +82,7 @@ const loadData = async () => {
   const fetchGroupImage = async (groupId) => {
     const token = await AsyncStorage.getItem('jwt_token');
     try {
-      const response = await axios.get(`http://127.0.0.1:5000/group_photo/${groupId}`, {
+      const response = await axios.get(`http://192.168.0.137:31000/group_photo/${groupId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.url && response.data.url.length > 0) {
@@ -100,7 +100,7 @@ const loadData = async () => {
   const handleSettleDebt = async (friend_id, amount) => {
     const token = await AsyncStorage.getItem('jwt_token');
     try {
-      const response = await axios.post(`http://127.0.0.1:5000/group_settle/${group_id}`, {
+      const response = await axios.post(`http://192.168.0.137:31000/group_settle/${group_id}`, {
         friend_id,
         amount_owed: amount
       }, {
@@ -122,14 +122,14 @@ const loadData = async () => {
   const fetchGroupMembers = async (groupId) => {
     const token = await AsyncStorage.getItem('jwt_token');
     try {
-      const membersResponse = await axios.get(`http://127.0.0.1:5000/group_members/${groupId}`, {
+      const membersResponse = await axios.get(`http://192.168.0.137:31000/group_members/${groupId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       console.log("MemberResponse:", membersResponse.data);
       if (membersResponse.data) {
         const membersWithDebts = await Promise.all(membersResponse.data.map(async member => {
           try {
-            const debtResponse = await axios.get(`http://127.0.0.1:5000/group_total/${groupId}/${member.user_id}`, {
+            const debtResponse = await axios.get(`http://192.168.0.137:31000/group_total/${groupId}/${member.user_id}`, {
               headers: { Authorization: `Bearer ${token}` }
             });
             console.log("debtResponse:", debtResponse.data);

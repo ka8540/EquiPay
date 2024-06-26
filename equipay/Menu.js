@@ -33,7 +33,7 @@ const Menu = ({ navigation }) => {
         return;
       }
 
-      const response = await axios.get('http://127.0.0.1:5000/friends', {
+      const response = await axios.get('http://192.168.0.137:31000/friends', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -65,7 +65,7 @@ const Menu = ({ navigation }) => {
     }
   
     try {
-      const response = await axios.get('http://127.0.0.1:5000/user_group', {
+      const response = await axios.get('http://192.168.0.137:31000/user_group', {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.data && Array.isArray(response.data)) {

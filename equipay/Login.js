@@ -15,7 +15,7 @@ export default function Login({ navigation }) {
       Alert.alert("Invalid Input", "Username and password must not be empty");
       return;
     }
-    const url = 'http://127.0.0.1:5000/login';
+    const url = 'http://192.168.0.137:31000/login';
   
     const formData = {
       username: username,
@@ -65,9 +65,10 @@ export default function Login({ navigation }) {
       <StatusBar style="auto" />
       <View style={styles.content}>
         <Image 
-          source={{ uri: 'https://profile-picture-docs.s3.amazonaws.com/Equipay.png' }}  
+          source={{ uri: 'https://profile-picture-docs.s3.amazonaws.com/LogoRemade-2.png' }}  
           style={styles.image}
         />
+        <Text style={styles.headerText}>EQUIPAY</Text>
         <Text style={styles.header}>Login</Text>
         <TextInput
           style={styles.input}
@@ -111,6 +112,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     margin: 10,
   },
+  headerText: {
+    fontSize: 50,             // Set the font size
+    fontWeight: '600',        // Medium-bold font weight
+    color: '#333',            // Set the text color to a deep gray
+    textAlign: 'center',      // Center the text horizontally
+    marginTop: 10,            // Moderate top margin
+    marginBottom: 5,          // Moderate bottom margin
+    fontFamily: 'Arial',      // Arial is a close match to Amazon’s font
+    marginBottom: 40,
+  },  
   input: {
     height: 50,
     marginVertical: 10,
@@ -121,8 +132,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   image: {
-    width: 320, 
-    height: 320,
+    width: 300, 
+    height: 300,
     marginBottom: 20, 
     borderRadius: 60, 
   },

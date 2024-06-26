@@ -30,3 +30,10 @@ spec:
                   key: AWS_SECRET_ACCESS_KEY
             - name: AWS_REGION
               value: "us-east-1"
+          resources:
+            requests:
+              cpu: "500m"  # Request a quarter core
+              memory: "512Mi"  # Request 512 MB
+            limits:
+              cpu: "1022m"  # Limit to half a core
+              memory: "1Gi"  # Limit to 1 GB

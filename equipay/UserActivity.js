@@ -12,7 +12,7 @@ const Activity = () => {
     try {
       const token = await AsyncStorage.getItem('jwt_token');
       console.log("TokenActivity:", token);
-      const response = await fetch('http://127.0.0.1:5000/activity', {
+      const response = await fetch('http://192.168.0.137:31000/activity', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

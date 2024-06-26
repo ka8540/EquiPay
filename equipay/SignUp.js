@@ -28,7 +28,7 @@ export default function SignUp({ navigation }) {
       return;
     }
     
-    const url = 'http://127.0.0.1:5000/signUp';
+    const url = 'http://192.168.0.137:31000/signUp';
     const formData = {
       firstname: firstname,
       lastname: lastname,

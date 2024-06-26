@@ -18,7 +18,7 @@ const Group = () => {
     setIsLoading(true);
     const token = await AsyncStorage.getItem('jwt_token');
     if (token) {
-      fetch('http://127.0.0.1:5000/user_group', {
+      fetch('http://192.168.0.137:31000/user_group', {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,

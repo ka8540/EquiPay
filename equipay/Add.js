@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, Switch, Alert, StyleSheet, Image } from 'react-native';
+import { View, TextInput, Button, Text, Switch, Alert, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
@@ -21,7 +21,7 @@ const AddItem = ({ route, navigation }) => {
     }
 
     try {
-      const response = await axios.post('http://127.0.0.1:5000/split-expense', {
+      const response = await axios.post('http://192.168.0.137:31000/split-expense', {
         amount: parseFloat(amount),
         friend_ids: userIds,
         include_self: includeSelf,
@@ -82,7 +82,7 @@ const AddItem = ({ route, navigation }) => {
       type: type,
     });
 
-    fetch('http://127.0.0.1:5000/upload-and-analyze', {
+    fetch('http://192.168.0.137:31000/upload-and-analyze', {
       method: 'POST',
       body: formData,
       headers: {
@@ -124,15 +124,18 @@ const AddItem = ({ route, navigation }) => {
       <View style={styles.switchContainer}>
         <Text style={styles.label}>Include Yourself:</Text>
         <Switch
-          trackColor={{ false: "#767577", true: "#d3ff4d" }}
-          thumbColor={includeSelf ? "#f9ffe5" : "#d3ff4d"}
+          trackColor={{ false: "#fff", true: "#007AFF" }}
+          thumbColor={includeSelf ? "#fff" : "#fff"}
           onValueChange={setIncludeSecretly}
           value={includeSelf}
         />
       </View>
-      <Button title="Add Image" onPress={pickImageAndUpload} />
-      <Button title="Split Expense" onPress={handleSplitExpense} />
-      {message ? <Text style={styles.message}>{message}</Text> : null}
+      <TouchableOpacity onPress={pickImageAndUpload} style={styles.button}>
+        <Text style={styles.buttonText}> Add Image</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={handleSplitExpense} style={[styles.button, styles.secondButton]}>
+        <Text style={styles.buttonText}>Split Expense</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -172,7 +175,26 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 16,
     color: 'red',
-  }
+  },
+  buttonText: {
+    fontSize: 18,
+    color: '#fff',
+    fontWeight: 'bold'
+},
+button: {
+  width: '100%',
+  padding: 15,
+  borderRadius: 5,
+  alignItems: 'center',
+  backgroundColor: '#007AFF',
+  marginTop: 30,
+  position:'relative',
+  top:200,
+},
+
+secondButton: {
+  marginTop: 10, // Additional space above the second button only
+},
 });
 
 export default AddItem;

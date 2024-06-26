@@ -20,7 +20,7 @@ const ViewProfile = ({ navigation }) => {
             }
 
             try {
-                const userResponse = await fetch('http://127.0.0.1:5000/accountapi', {
+                const userResponse = await fetch('http://192.168.0.137:31000/accountapi', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -46,7 +46,7 @@ const ViewProfile = ({ navigation }) => {
                     console.error("Received empty data array");
                 }
 
-                const imageResponse = await fetch('http://127.0.0.1:5000/upload', {
+                const imageResponse = await fetch('http://192.168.0.137:31000/upload', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
