@@ -15,7 +15,7 @@ export default function Login({ navigation }) {
       Alert.alert("Invalid Input", "Username and password must not be empty");
       return;
     }
-    const url = 'http://192.168.0.137:31000/login';
+    const url = 'http://127.0.0.1:5000/login';
   
     const formData = {
       username: username,
@@ -29,35 +29,43 @@ export default function Login({ navigation }) {
     };
   
     fetch(url, requestOptions)
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error('Some error occurred, please try again later.');
-        }
-      })
-      .then(data => {
-        if (data.sessionKey && data.access_token) {
-          Promise.all([
-            AsyncStorage.setItem('sessionKey', data.sessionKey),
-            AsyncStorage.setItem('jwt_token', data.access_token)
-          ])
-            .then(() => {
-              Alert.alert("Login Successfully");
-              navigation.reset({
-                index: 0,
-                routes: [{ name: 'MainApp' }],
-              });
-            })
-            .catch(error => console.error('AsyncStorage error: ', error));
-        } else {
-          throw new Error('No session key or token received');
-        }
-      })
-      .catch(error => {
-        Alert.alert("Login Error", error.message);
-        console.error('Error:', error);
-      });
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else if (response.status === 211 || response.status === 201) {
+        const statusMessage = response.status === 211 ? "Invalid Password" : "Invalid Credentials";
+        Alert.alert(statusMessage, "Username or password is incorrect.");
+        console.error(`Login failed with status ${response.status}`);
+        return null;  
+      } else {
+        throw new Error(`Unhandled exception with status ${response.status}`);
+      }
+    })
+    .then(data => {
+      console.log('Data received:', data); // Log the data to see what's received
+      if (!data) {
+        console.log('No data received, stopping execution');
+        return;
+      }
+      if (data.sessionKey && data.access_token) {
+        AsyncStorage.setItem('sessionKey', data.sessionKey);
+        AsyncStorage.setItem('jwt_token', data.access_token);
+        Alert.alert("Login Successfully");
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'MainApp' }],
+        });
+      } else if (data.message) {
+        Alert.alert("Login Error", data.message);
+      } else {
+        console.error('Incomplete data received:', data);
+        throw new Error('No session key or token received');
+      }
+    })
+    .catch(error => {
+      Alert.alert("Login Error", error.message);
+      console.error('Login Error:', error);
+    });  
   };
 
   return (

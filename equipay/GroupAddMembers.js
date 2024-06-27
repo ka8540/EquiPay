@@ -22,7 +22,7 @@ const GroupAddMembers = () => {
         Alert.alert("Error", "Authentication token is not available");
         return;
       }
-      const response = await axios.get('http://192.168.0.137:31000/friends', {
+      const response = await axios.get('http://127.0.0.1:5000/friends', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -57,7 +57,7 @@ const GroupAddMembers = () => {
       return;
     }
     try {
-      const response = await axios.post('http://192.168.0.137:31000/create_group', {
+      const response = await axios.post('http://127.0.0.1:5000/create_group', {
         group_name: groupName,
         profile_picture_url: profilePictureUrl,
         friend_ids: selectedFriends,

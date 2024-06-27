@@ -110,8 +110,8 @@ api.add_resource(FriendNameAPI, '/friend_name/<int:friend_id>')
 def setup_database():
     print("Loading db")
     exec_sql_file('data/data.sql')
-
 if __name__ == '__main__':
     print("Starting flask")
     setup_database()
+    app.run(host="0.0.0.0", port=5000)
     app.run(debug=True)

@@ -40,10 +40,10 @@ const FriendsDashboard = () => {
   
     try {
       const responses = await Promise.all([
-        axios.get(`http://192.168.0.137:31000/total-amount/${friend_id}`, { headers: { Authorization: `Bearer ${token}`, 'Session-Key': sessionKey }}),
-        axios.get(`http://192.168.0.137:31000/friend-profile-picture/${friend_id}`, { headers: { Authorization: `Bearer ${token}`, 'Session-Key': sessionKey }}),
-        axios.get(`http://192.168.0.137:31000/debts-by-friend/${friend_id}`, { headers: { Authorization: `Bearer ${token}`, 'Session-Key': sessionKey }}),
-        axios.get(`http://192.168.0.137:31000/friend_name/${friend_id}`, { headers: { Authorization: `Bearer ${token}`, 'Session-Key': sessionKey }})
+        axios.get(`http://127.0.0.1:5000/total-amount/${friend_id}`, { headers: { Authorization: `Bearer ${token}`, 'Session-Key': sessionKey }}),
+        axios.get(`http://127.0.0.1:5000/friend-profile-picture/${friend_id}`, { headers: { Authorization: `Bearer ${token}`, 'Session-Key': sessionKey }}),
+        axios.get(`http://127.0.0.1:5000/debts-by-friend/${friend_id}`, { headers: { Authorization: `Bearer ${token}`, 'Session-Key': sessionKey }}),
+        axios.get(`http://127.0.0.1:5000/friend_name/${friend_id}`, { headers: { Authorization: `Bearer ${token}`, 'Session-Key': sessionKey }})
       ]);
   
       const [amountResponse, profilePicResponse, debtsResponse, nameResponse] = responses;
@@ -98,7 +98,7 @@ const FriendsDashboard = () => {
       return;
     }
     try {
-      const response = await axios.post('http://192.168.0.137:31000/delete-debt', { friend_id }, {
+      const response = await axios.post('http://127.0.0.1:5000/delete-debt', { friend_id }, {
         headers: { Authorization: `Bearer ${token}`, 'Session-Key': sessionKey, 'Content-Type': 'application/json' }
       });
       if (response.status === 200) {

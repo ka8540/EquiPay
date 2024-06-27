@@ -17,7 +17,7 @@ const GroupMembers = ({ navigation, route }) => {
     setLoading(true);
     const token = await AsyncStorage.getItem('jwt_token');
     try {
-      const response = await axios.get(`http://192.168.0.137:31000/group_members/${groupId}`, {
+      const response = await axios.get(`http://127.0.0.1:5000/group_members/${groupId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

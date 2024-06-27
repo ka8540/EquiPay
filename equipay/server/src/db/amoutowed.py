@@ -56,11 +56,10 @@ def delete_debt(user_id, friend_id):
     print("friend_id:", friend_id)
     query = '''
     DELETE FROM Debts
-    WHERE (OwedToUserID = %s AND OwedByUserID = %s)
-    OR (OwedToUserID = %s AND OwedByUserID = %s);
+    WHERE (OwedToUserID = %s AND OwedByUserID = %s);
     '''
     try:
-        exec_commit(query, (user_id, friend_id,friend_id, user_id,))
+        exec_commit(query, (user_id, friend_id,))
         return True  
     except Exception as e:
         print("Failed to delete debt:", e)

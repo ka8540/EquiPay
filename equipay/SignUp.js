@@ -9,6 +9,7 @@ export default function SignUp({ navigation }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmpassword, setConfirmPassword] = useState('');
+  const [contactNumber, setContactNumber] = useState('');
 
   const navigateToLogin = () => {
     navigation.navigate('Login');
@@ -28,7 +29,7 @@ export default function SignUp({ navigation }) {
       return;
     }
     
-    const url = 'http://192.168.0.137:31000/signUp';
+    const url = 'http://127.0.0.1:5000/signUp';
     const formData = {
       firstname: firstname,
       lastname: lastname,
@@ -36,7 +37,9 @@ export default function SignUp({ navigation }) {
       username: username,
       password: password,
       confirmpassword: confirmpassword,
+      contact_number: contactNumber,  // Add this line
     };
+    
 
     const requestOptions = {
       method: 'POST',
@@ -108,6 +111,14 @@ export default function SignUp({ navigation }) {
           value={username}
           onChangeText={setUsername}
           keyboardType="default"
+        />
+
+        <TextInput
+          style={styles.input}
+          placeholder="Contact Number"
+          value={contactNumber}
+          onChangeText={setContactNumber}
+          keyboardType="phone-pad"
         />
 
         <TextInput

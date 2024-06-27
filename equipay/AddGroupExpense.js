@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, Alert, Image } from 'react-native';
+import { View, TextInput, Button, Text, StyleSheet, Alert, Image , TouchableOpacity} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
@@ -20,7 +20,7 @@ const AddGroupExpense = ({ route, navigation }) => {
     }
 
     try {
-      const response = await axios.post(`http://192.168.0.137:31000/group_expense/${groupId}`, {
+      const response = await axios.post(`http://127.0.0.1:5000/group_expense/${groupId}`, {
         amount: parseFloat(amount),
         friend_ids: selectedUserIds,
         include_self: includeSelf,
@@ -76,7 +76,7 @@ const AddGroupExpense = ({ route, navigation }) => {
     const formData = new FormData();
     formData.append('file', { uri: firstAsset.uri, name: filename, type });
 
-    axios.post('http://192.168.0.137:31000/upload-and-analyze', formData, {
+    axios.post('http://127.0.0.1:5000m/upload-and-analyze', formData, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'multipart/form-data',
@@ -112,8 +112,12 @@ const AddGroupExpense = ({ route, navigation }) => {
         onChangeText={setDescription}
         style={styles.input}
       />
-      <Button title="Add Image" onPress={pickImageAndUpload} />
-      <Button title="Split Expense" onPress={handleSplitExpense} />
+      <TouchableOpacity onPress={pickImageAndUpload} style={styles.button}>
+        <Text style={styles.buttonText}> Add Image</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={handleSplitExpense} style={[styles.button, styles.secondButton]}>
+        <Text style={styles.buttonText}>Split Expense</Text>
+      </TouchableOpacity>
       {message ? <Text style={styles.message}>{message}</Text> : null}
     </View>
   );
@@ -145,7 +149,26 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 16,
     color: 'red',
-  }
+  },
+  buttonText: {
+    fontSize: 18,
+    color: '#fff',
+    fontWeight: 'bold'
+},
+button: {
+  width: '100%',
+  padding: 15,
+  borderRadius: 5,
+  alignItems: 'center',
+  backgroundColor: '#007AFF',
+  marginTop: 30,
+  position:'relative',
+  top:220,
+},
+
+secondButton: {
+  marginTop: 10,
+},
 });
 
 export default AddGroupExpense;

@@ -20,6 +20,7 @@ class SignUpApi(Resource):
         parser.add_argument('email', type=str, required=True, location='json')
         parser.add_argument('firstname', type=str, required=True, location='json')
         parser.add_argument('lastname', type=str, required=True, location='json')
+        parser.add_argument('contact_number', type=str, required=True, location='json')
         args = parser.parse_args()
 
         user_data = {
@@ -27,7 +28,8 @@ class SignUpApi(Resource):
             'password': args['password'],
             'email': args['email'],
             'firstname': args['firstname'],
-            'lastname': args['lastname']
+            'lastname': args['lastname'],
+            'contact_number': args['contact_number']
         }
         
         response, status_code = user_signup(self.bcrypt, **user_data)

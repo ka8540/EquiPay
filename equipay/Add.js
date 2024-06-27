@@ -21,7 +21,7 @@ const AddItem = ({ route, navigation }) => {
     }
 
     try {
-      const response = await axios.post('http://192.168.0.137:31000/split-expense', {
+      const response = await axios.post('http://127.0.0.1:5000/split-expense', {
         amount: parseFloat(amount),
         friend_ids: userIds,
         include_self: includeSelf,
@@ -82,7 +82,7 @@ const AddItem = ({ route, navigation }) => {
       type: type,
     });
 
-    fetch('http://192.168.0.137:31000/upload-and-analyze', {
+    fetch('http://127.0.0.1:5000/upload-and-analyze', {
       method: 'POST',
       body: formData,
       headers: {

@@ -24,14 +24,14 @@ const AddFriends = ({ navigation }) => {
     }
 
     try {
-      const userResponse = await axios.get('http://192.168.0.137:31000/listUsers', {
+      const userResponse = await axios.get('http://127.0.0.1:5000/listUsers', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Session-Key': sessionKey,
         },
       });
 
-      const pendingResponse = await axios.get('http://192.168.0.137:31000/addFriend', {
+      const pendingResponse = await axios.get('http://127.0.0.1:5000/addFriend', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Session-Key': sessionKey,
@@ -63,7 +63,7 @@ const AddFriends = ({ navigation }) => {
     const sessionKey = await AsyncStorage.getItem('sessionKey');
     const token = await AsyncStorage.getItem('jwt_token');
     try {
-      const response = await axios.put('http://192.168.0.137:31000/addFriend', {
+      const response = await axios.put('http://127.0.0.1:5000/addFriend', {
         friend_id: friendId, 
         action: action
       }, {
@@ -111,7 +111,7 @@ const AddFriends = ({ navigation }) => {
     }
 
     try {
-      const response = await axios.post('http://192.168.0.137:31000/addFriend', { friend_id: friendId }, {
+      const response = await axios.post('http://127.0.0.1:5000/addFriend', { friend_id: friendId }, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Session-Key': sessionKey,

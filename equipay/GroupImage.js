@@ -49,7 +49,7 @@ const GroupImage = ({ navigation }) => {
         const formData = new FormData();
         formData.append('file', { uri: localUri, name: filename, type });
 
-        fetch(`http://192.168.0.137:31000/group_photo/${group_id}`, {
+        fetch(`http://127.0.0.1:5000/group_photo/${group_id}`, {
             method: 'POST',
             body: formData,
             headers: {

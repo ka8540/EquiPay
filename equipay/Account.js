@@ -13,7 +13,7 @@ const Account = ({ navigation }) => {
         const token = await AsyncStorage.getItem('jwt_token');
         if (sessionKey && token) {
             try {
-                const response = await fetch('http://192.168.0.137:31000/upload', {
+                const response = await fetch('http://127.0.0.1:5000/upload', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,

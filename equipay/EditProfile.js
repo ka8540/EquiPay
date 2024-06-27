@@ -18,7 +18,7 @@ const EditProfile = ({ navigation }) => {
                 return;
             }
             try {
-                const response = await fetch('http://192.168.0.137:31000/accountapi', {
+                const response = await fetch('http://127.0.0.1:5000/accountapi', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -53,7 +53,7 @@ const EditProfile = ({ navigation }) => {
             return;
         }
         try {
-            const response = await fetch('http://192.168.0.137:31000/accountapi', {
+            const response = await fetch('http://127.0.0.1:5000/accountapi', {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,

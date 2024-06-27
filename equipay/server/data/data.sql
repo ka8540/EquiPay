@@ -18,7 +18,8 @@ CREATE TABLE "user" (
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     session_key VARCHAR(255) UNIQUE,
-    profile_pic VARCHAR(255)
+    profile_pic VARCHAR(255),
+    contact_number VARCHAR(20)
 );
 
 -- Create Expenses Table
@@ -92,17 +93,17 @@ CREATE TABLE ActivityLog (
 );
 
 
-INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Rahul', 'Sharma', 'rahul', '$2b$12$YAHoV9QGxM8T/.ArdKjLTeG/5o/MLkVig.6FHXUmILpbYO2tJO8tK', 'rahul.sharma@example.com', NULL ,NULL);
-INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Anjali', 'Verma', 'anjali.verma', 'Password123!', 'anjali.verma@example.com', NULL ,NULL);
-INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Vikram', 'Singh', 'vikram.singh', 'SecurePass!1', 'vikram.singh@example.com', NULL ,NULL);
-INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Priya', 'Nair', 'priya.nair', 'MyPass123!', 'priya.nair@example.com', NULL ,NULL);
-INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Amit', 'Patel', 'amit.patel', 'PassWord!123', 'amit.patel@example.com', NULL ,NULL);
-INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Sneha', 'Kumar', 'sneha.kumar', 'SuperPass!1', 'sneha.kumar@example.com', NULL ,NULL);
-INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Rohan', 'Mehta', 'rohan.mehta', 'UltraPass!123', 'rohan.mehta@example.com', NULL ,NULL);
-INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Kavita', 'Desai', 'kavita.desai', 'MegaPass!1', 'kavita.desai@example.com', NULL ,NULL);
-INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Arjun', 'Joshi', 'arjun.joshi', 'TopPass!123', 'arjun.joshi@example.com', NULL ,NULL);
-INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('Nidhi', 'Rao', 'nidhi.rao', 'BestPass!1', 'nidhi.rao@example.com', NULL ,NULL);
-INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic) VALUES ('12', '12', '12', '$2b$12$YAHoV9QGxM8T/.ArdKjLTeG/5o/MLkVig.6FHXUmILpbYO2tJO8tK', '12@12', NULL ,NULL);
+INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic,contact_number) VALUES ('Rahul', 'Sharma', 'rahul', '$2b$12$YAHoV9QGxM8T/.ArdKjLTeG/5o/MLkVig.6FHXUmILpbYO2tJO8tK', 'rahul.sharma@example.com', NULL ,NULL,'+15859575220');
+INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic,contact_number) VALUES ('Anjali', 'Verma', 'anjali.verma', 'Password123!', 'anjali.verma@example.com', NULL ,NULL,'+15859575221');
+INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic,contact_number) VALUES ('Vikram', 'Singh', 'vikram.singh', 'SecurePass!1', 'vikram.singh@example.com', NULL ,NULL,'+15859575222');
+INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic,contact_number) VALUES ('Priya', 'Nair', 'priya.nair', 'MyPass123!', 'priya.nair@example.com', NULL ,NULL,'+15859575223');
+INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic,contact_number) VALUES ('Amit', 'Patel', 'amit.patel', 'PassWord!123', 'amit.patel@example.com', NULL ,NULL,'+15859575224');
+INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic,contact_number) VALUES ('Sneha', 'Kumar', 'sneha.kumar', 'SuperPass!1', 'sneha.kumar@example.com', NULL ,NULL,'+15859575225');
+INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic,contact_number) VALUES ('Rohan', 'Mehta', 'rohan.mehta', 'UltraPass!123', 'rohan.mehta@example.com', NULL ,NULL,'+15859575226');
+INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic,contact_number) VALUES ('Kavita', 'Desai', 'kavita.desai', 'MegaPass!1', 'kavita.desai@example.com', NULL ,NULL,'+15859575227');
+INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic,contact_number) VALUES ('Arjun', 'Joshi', 'arjun.joshi', 'TopPass!123', 'arjun.joshi@example.com', NULL ,NULL,'+15859575228');
+INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic,contact_number) VALUES ('Nidhi', 'Rao', 'nidhi.rao', 'BestPass!1', 'nidhi.rao@example.com', NULL ,NULL,'+15859575229');
+INSERT INTO "user" (firstname, lastname, username, password, email, session_key,profile_pic,contact_number) VALUES ('12', '12', '12', '$2b$12$YAHoV9QGxM8T/.ArdKjLTeG/5o/MLkVig.6FHXUmILpbYO2tJO8tK', '12@12', NULL ,NULL,'+918980387432');
 
 
 INSERT INTO Friends (UserID, FriendUserID, Status) VALUES ('1', '11', 'accepted');

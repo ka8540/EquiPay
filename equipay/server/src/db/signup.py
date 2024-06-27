@@ -16,7 +16,7 @@ def user_signup(bcrypt, **kwargs):
     username = kwargs.get('username')
     password_kwargs = kwargs.get('password')
     email = kwargs.get('email')
-    
+    contact_number = kwargs.get('contact_number') 
     # Hash the password using bcrypt
     password = bcrypt.generate_password_hash(password_kwargs).decode('utf-8')
 
@@ -30,8 +30,8 @@ def user_signup(bcrypt, **kwargs):
         return {"message": "User already exists"}, 409  # HTTP 409 Conflict
 
     # If the user does not exist, proceed to insert the new user
-    tuple_to_insert = (firstname, lastname, username, password, email)
-    query_insert = 'INSERT INTO "user" (firstname, lastname, username, password, email) VALUES (%s, %s, %s, %s, %s);'
+    tuple_to_insert = (firstname, lastname, username, password, email,contact_number)
+    query_insert = 'INSERT INTO "user" (firstname, lastname, username, password, email,contact_number) VALUES (%s, %s, %s, %s, %s,%s);'
     exec_commit(query_insert, tuple_to_insert)
 
     # Return a success message (consider also returning an appropriate status code)

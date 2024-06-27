@@ -23,6 +23,6 @@ def check_user_credentials(bcrypt, username, password):
         exec_commit(update_session_key_query, (session_key, username))
         return {"message": "Login Creds are Correct", "sessionKey": session_key}, 200
     elif user and not bcrypt.check_password_hash(user[1], password):  # Accessing password using index 1
-        return {"message": "Password Invalid", "sessionKey": None}, 411
+        return {"message": "Password Invalid", "sessionKey": None}, 211
     else:
-        return {"message": "Login Creds are Incorrect", "sessionKey": None}, 410
+        return {"message": "Login Creds are Incorrect", "sessionKey": None}, 201

@@ -48,5 +48,5 @@ class DeleteDebtAPI(Resource):
 
             return make_response(jsonify({"message": "Debt record deleted successfully"}), 200)
         else:
-            return make_response(jsonify({"error": "Failed to delete debt record"}), 400)
+            return make_response(jsonify({"message": "No Debt Record"}), 201)
     

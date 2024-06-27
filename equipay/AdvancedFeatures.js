@@ -31,7 +31,7 @@ const AdvancedFeatures = ({ navigation }) => {
         }
 
         try {
-            const response = await fetch('http://192.168.0.137:31000/deleteaccount', {
+            const response = await fetch('http://127.0.0.1:5000/deleteaccount', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
