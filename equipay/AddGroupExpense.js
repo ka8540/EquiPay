@@ -76,7 +76,7 @@ const AddGroupExpense = ({ route, navigation }) => {
     const formData = new FormData();
     formData.append('file', { uri: firstAsset.uri, name: filename, type });
 
-    axios.post('http://127.0.0.1:5000m/upload-and-analyze', formData, {
+    axios.post('http://127.0.0.1:5000/upload-and-analyze', formData, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'multipart/form-data',

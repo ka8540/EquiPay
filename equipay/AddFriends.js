@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, Button } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Contacts from 'expo-contacts';
 
 const AddFriends = ({ navigation }) => {
   const [users, setUsers] = useState([]);
@@ -10,6 +11,33 @@ const AddFriends = ({ navigation }) => {
 
   useEffect(() => {
     fetchData();
+  }, []);
+
+  const fetchDeviceContacts = async () => {
+    const { status } = await Contacts.requestPermissionsAsync();
+    if (status === 'granted') {
+      const { data } = await Contacts.getContactsAsync({
+        fields: [Contacts.Fields.Emails, Contacts.Fields.Name],
+      });
+  
+      if (data.length > 0) {
+        return data.map(contact => ({
+          id: contact.id,
+          name: contact.name,
+          email: contact.emails?.[0]?.email,
+        }));
+      }
+    }
+    return [];
+  };
+  
+  useEffect(() => {
+    const loadContacts = async () => {
+      const deviceContacts = await fetchDeviceContacts();
+      setUsers(prevUsers => [...prevUsers, ...deviceContacts]);
+    };
+  
+    loadContacts();
   }, []);
 
   const fetchData = async () => {

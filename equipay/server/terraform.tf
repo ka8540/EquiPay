@@ -133,7 +133,7 @@ resource "aws_instance" "docker_host" {
       "sudo yum install -y docker",
       "sudo service docker start",
       "sudo usermod -a -G docker ec2-user",
-      "sudo docker pull kayahir/server:latest",
+      "sudo docker pull kayahir/server2:latest",
       "sudo docker run -d --name server -p 5000:5000 kayahir/server:latest"
     ]
   }

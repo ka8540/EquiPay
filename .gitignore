@@ -4,4 +4,8 @@
 package.json 
 package-lock.json
 
-server/aws-secret.yaml
+server/aws-secret.yamlequipay/server/.terraform/
+equipay/server/.terraform/
+node_modules
+node_modules
+node_modules
