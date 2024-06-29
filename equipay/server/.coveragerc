@@ -1,4 +1,0 @@
-[run]
-omit =
-    tests/test_utils.py
-    src/*
