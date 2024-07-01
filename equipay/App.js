@@ -24,6 +24,7 @@ import GroupImage from './GroupImage';
 import GroupMembersDashboard from './GroupMembersDashboard';
 import GroupMembers from './GroupMembers';
 import AddGroupExpense from './AddGroupExpense';
+import Members from './Members.js';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -72,6 +73,12 @@ function GroupStack() {
         component={GroupImage}
         options={{ headerShown: true }}
       />
+      <Stack.Screen 
+        name="Members" 
+        component={Members}
+        options={{ headerShown: true }}
+      />
+
     </Stack.Navigator>
   );
 }

@@ -35,6 +35,9 @@ try:
     from api.activity_api import ActivityAPI
     from api.account_api import FriendNameAPI
     from api.contact_list_api import ContactListAPI
+    from api.delete_group_api import DeleteGroupAPI
+    from api.leave_group_api import LeaveGroupAPI
+    from api.add_group_members_api import AddGroupMembersAPI
 except ImportError:
     from utilities.swen_344_db_utils import exec_sql_file
     from api.login_api import LoginAPI
@@ -66,6 +69,9 @@ except ImportError:
     from api.activity_api import ActivityAPI
     from api.account_api import FriendNameAPI
     from api.contact_list_api import ContactListAPI
+    from api.delete_group_api import DeleteGroupAPI
+    from api.leave_group_api import LeaveGroupAPI
+    from api.add_group_members_api import AddGroupMembersAPI
 
 app = Flask(__name__)
 CORS(app)
@@ -109,6 +115,9 @@ api.add_resource(GraphAPI, '/graph_values')
 api.add_resource(ActivityAPI, '/activity')
 api.add_resource(FriendNameAPI, '/friend_name/<int:friend_id>')
 api.add_resource(ContactListAPI, '/contact_list')
+api.add_resource(DeleteGroupAPI, '/delete_group/<int:group_id>')
+api.add_resource(LeaveGroupAPI, '/leave_group/<int:group_id>')
+api.add_resource(AddGroupMembersAPI, '/add_group_member/<int:group_id>')
 
 def setup_database():
     print("Loading db")

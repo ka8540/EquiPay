@@ -15,7 +15,7 @@ const GroupMembersDashboard = () => {
   const { group_id } = route.params;
   const [refreshing, setRefreshing] = useState(false);
   const [expenses, setExpenses] = useState([]);
-  
+  const [isAdmin, setIsAdmin] = useState(false);
   
 
   useEffect(() => {
@@ -118,26 +118,81 @@ const loadData = async () => {
     }
   };
 
+  const handleDeleteGroup = async (group_id) => {
+    const token = await AsyncStorage.getItem('jwt_token');
+    try {
+      const response = await axios.post(`http://127.0.0.1:5000/delete_group/${group_id}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+  
+      if (response.status === 200) {
+        Alert.alert("Success", "Group deleted successfully");
+        navigation.goBack(); // Assuming you want to navigate back after deletion
+      } else if (response.status === 201) {
+        Alert.alert("Permission Denied", "You are not an admin, so you can't delete the group.");
+      } else {
+        Alert.alert("Error", "Failed to delete group");
+      }
+    } catch (error) {
+      console.error('Error deleting group:', error);
+      Alert.alert("Error", "Failed to delete group");
+    }
+  };
+
+  const handleLeaveGroup = async () => {
+    Alert.alert(
+      "Confirm",
+      "Are you sure you want to leave the group?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        { text: "Yes", onPress: async () => {
+          const token = await AsyncStorage.getItem('jwt_token');
+          if (!token) {
+            Alert.alert("Error", "Authentication token not found");
+            return;
+          }
+  
+          try {
+            const response = await axios.put(`http://127.0.0.1:5000/leave_group/${group_id}`, {}, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.status === 200) {
+              Alert.alert("Success", "You have left the group");
+              navigation.goBack();
+            } else {
+              Alert.alert("Error", "Could not leave the group");
+            }
+          } catch (error) {
+            console.error('Error leaving group:', error);
+            Alert.alert("Error", "Failed to leave the group");
+          }
+        }}
+      ],
+      { cancelable: false }
+    );
+  };
+  
+  
+
   
   const fetchGroupMembers = async (groupId) => {
     const token = await AsyncStorage.getItem('jwt_token');
+    const userId = await AsyncStorage.getItem('user_id'); 
     try {
       const membersResponse = await axios.get(`http://127.0.0.1:5000/group_members/${groupId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      console.log("MemberResponse:", membersResponse.data);
       if (membersResponse.data) {
         const membersWithDebts = await Promise.all(membersResponse.data.map(async member => {
-          try {
-            const debtResponse = await axios.get(`http://127.0.0.1:5000/group_total/${groupId}/${member.user_id}`, {
-              headers: { Authorization: `Bearer ${token}` }
-            });
-            console.log("debtResponse:", debtResponse.data);
-            return { ...member, debtAmount: parseFloat(debtResponse.data.net_amount) || 0 };
-          } catch (debtError) {
-            console.error('Error fetching debt for member:', member.user_id, debtError);
-            return { ...member, debtAmount: 0 }; 
-          }
+          const isCurrentUserAdmin = member.user_id.toString() === userId && member.is_admin;
+          if (isCurrentUserAdmin) setIsAdmin(true);
+          const debtResponse = await axios.get(`http://127.0.0.1:5000/group_total/${groupId}/${member.user_id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          return { ...member, debtAmount: parseFloat(debtResponse.data.net_amount) || 0 };
         }));
         setMembers(membersWithDebts);
       }
@@ -150,7 +205,8 @@ const loadData = async () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <TouchableOpacity
           style={styles.profilePicContainer}
           onPress={() => navigation.navigate('GroupImage', { group_id })}
         >
@@ -162,26 +218,36 @@ const loadData = async () => {
         </TouchableOpacity>
         <Text style={styles.groupName}>{groupName}</Text>
       </View>
+      <View style={styles.horizontalLine}></View>
+      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteGroup(group_id)}>
+        <Text style={styles.deleteButtonText}>Delete Group</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.leaveButton} onPress={handleLeaveGroup}>
+      <Text style={styles.leaveButtonText}>Leave Group</Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+      style={styles.AddMemberButton}
+      onPress={() => navigation.navigate('Members', { group_id })}
+    >
+      <Text style={styles.leaveButtonText}>Add Member</Text>
+    </TouchableOpacity>
+
+    </View>
+    </View>
       <FlatList
         data={members}
         keyExtractor={item => item.user_id.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.memberItem} onPress={() => selectMember(item)}>
             <Ionicons name={item.is_admin ? 'shield-checkmark' : 'people'} size={24} color="#4CAF50" />
-            <Text style={styles.memberName}>
-              {item.first_name} 
-            </Text>
+            <Text style={styles.memberName}>{item.first_name}</Text>
             <Text style={[
               styles.debtAmount,
-              {
-                color: item.debtAmount >= 0 ? 'green' : 'red', 
-                position: 'absolute', 
-                right: 10  
-              }
+              {color: item.debtAmount >= 0 ? 'green' : 'red', position: 'absolute', right: 10}
             ]}>
               ${item.debtAmount.toFixed(2)}
             </Text>
-
             {selectedMemberId === item.user_id && item.debtAmount > 0 && (
               <TouchableOpacity style={styles.settleButton} onPress={() => handleSettleDebt(item.user_id, item.debtAmount)}>
                 <Text style={styles.settleButtonText}>Settle Debt</Text>
@@ -210,55 +276,57 @@ const loadData = async () => {
               <RefreshControl refreshing={refreshing} onRefresh={loadData} />
           }
       />
-
-
     </View>
-  );
+);
 };
 
 const styles = StyleSheet.create({
   container: {
-      flex: 1,
-      backgroundColor: '#f0f0f0',
-  },
-  header: {
-      flexDirection: 'row',
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingTop: 50,
-      paddingBottom: 30,
-      paddingHorizontal: 10,
-      borderBottomWidth: 1,
-      borderBottomColor: '#cccccc',
-      backgroundColor: '#ffffff',
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 2,
-      elevation: 2,
-  },
-  profilePicContainer: {
-      position: 'absolute',
-      left: 15,
-      top: 10,
-      width: 100,
-      height: 100,
-      borderRadius: 50,
-      backgroundColor: '#e0e0e0',
-      overflow: 'hidden',
-      justifyContent: 'center',
-      alignItems: 'center',
-  },
-  profilePic: {
-      width: '100%',
-      height: '100%',
-  },
-  groupName: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: '#333333',
-      marginBottom: 10,
-  },
+    flex: 1,
+    backgroundColor: '#f0f0f0',
+},
+header: {
+    alignItems: 'center',
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingHorizontal: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#cccccc',
+    backgroundColor: '#ffffff',
+},
+profilePicContainer: {
+    width: 140,
+    height: 140,
+    borderRadius: 80,
+    backgroundColor: '#e0e0e0',
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+    position:'static',
+    right:60,
+},
+profilePic: {
+    width: '100%',
+    height: '100%',
+},
+groupName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333333',
+    marginLeft: 20,
+},
+deleteButton: {
+  backgroundColor: 'red',
+  padding: 10,
+  borderRadius: 5,
+  alignSelf: 'left', 
+},
+deleteButtonText: {
+  color: 'white',
+  fontSize: 16,
+  textAlign: 'center',
+},
   memberItem: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -317,7 +385,30 @@ const styles = StyleSheet.create({
       fontSize: 14,
       color: '#999',
       marginTop: 5
-  }
+  },
+  horizontalLine: {
+    width: '100%',
+    height: 1,
+    backgroundColor: '#d3d3d3',
+    marginBottom: 10,  
+  },
+  leaveButton: {
+    backgroundColor: 'orange',
+    padding: 10,
+    borderRadius: 5,
+    marginLeft:10
+  },
+  leaveButtonText: {
+    color: 'white',
+    fontSize: 16,
+    textAlign: 'center'
+  },
+  AddMemberButton:{
+    backgroundColor: 'green',
+    padding: 10,
+    borderRadius: 5,
+    marginLeft:10
+  },
 });
 export default GroupMembersDashboard;
 
