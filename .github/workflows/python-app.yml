@@ -46,10 +46,11 @@ jobs:
         run: |
           echo "PYTHONPATH=${{ github.workspace }}/equipay/server/src" >> $GITHUB_ENV
           echo "FLASK_APP=src/server.py" >> $GITHUB_ENV
-          echo "CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }}" >> $GITHUB_ENV
 
       - name: Verify Codecov token
         run: echo "Codecov token is ${{ secrets.CODECOV_TOKEN }}"
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - name: List files in the src directory
         run: ls -alh
@@ -74,3 +75,5 @@ jobs:
         uses: codecov/codecov-action@v4.0.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
