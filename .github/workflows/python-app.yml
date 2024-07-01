@@ -49,7 +49,7 @@ jobs:
           echo "CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }}" >> $GITHUB_ENV
 
       - name: Verify Codecov token
-        run: echo "Codecov token is set"
+        run: echo "Codecov token is ${{ secrets.CODECOV_TOKEN }}"
 
       - name: List files in the src directory
         run: ls -alh
