@@ -67,6 +67,9 @@ jobs:
           coverage report -m
         working-directory: ${{ github.workspace }}/equipay/server
         
+      - name: Print environment variables
+        run: printenv
+
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4.0.1
         with:
