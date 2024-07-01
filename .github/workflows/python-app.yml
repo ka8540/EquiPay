@@ -42,17 +42,14 @@ jobs:
           pip install -r equipay/server/requirements.txt
           pip install coverage
           
-      - name: Set PYTHONPATH
-        run: echo "PYTHONPATH=${{ github.workspace }}/equipay/server/src" >> $GITHUB_ENV
-
-      - name: Set FLASK_APP environment variable
-        run: echo "FLASK_APP=src/server.py" >> $GITHUB_ENV
-
-      - name: Set Codecov token environment variable
-        run: echo "CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }}" >> $GITHUB_ENV
+      - name: Set environment variables
+        run: |
+          echo "PYTHONPATH=${{ github.workspace }}/equipay/server/src" >> $GITHUB_ENV
+          echo "FLASK_APP=src/server.py" >> $GITHUB_ENV
+          echo "CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }}" >> $GITHUB_ENV
 
       - name: Verify Codecov token
-        run: echo "Codecov token is ${{ secrets.CODECOV_TOKEN }}"
+        run: echo "Codecov token is set"
 
       - name: List files in the src directory
         run: ls -alh
