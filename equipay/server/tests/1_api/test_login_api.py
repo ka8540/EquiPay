@@ -35,24 +35,19 @@ class LoginApiTestCase(unittest.TestCase):
 
     @patch('requests.post')
     def test_failed_login(self, mock_post):
-        # Data for a failed login attempt
         user_credentials = {
             "username": "wronguser",
             "password": "wrongpassword"
         }
 
-        # Mocking the response for a failed login
         mock_response = unittest.mock.Mock()
         mock_response.status_code = 401
         mock_response.json.return_value = {"message": "Invalid credentials"}
 
-        # Setting the return value of the post request
         mock_post.return_value = mock_response
 
-        # Calling the function
         response = requests.post(self.BASE_URL, json=user_credentials)
 
-        # Assertions to validate behavior
         mock_post.assert_called_once_with(self.BASE_URL, json=user_credentials)
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.json(), {"message": "Invalid credentials"})
