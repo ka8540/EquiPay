@@ -22,7 +22,6 @@ class LoginAPI(Resource):
         response, status_code = check_user_credentials(self.bcrypt, args['username'], args['password'])
         
         if status_code == 200:
-            # Set token to expire in 24 hours
             expires = timedelta(hours=24)
             access_token = create_access_token(identity={"username": args['username'], "session_key": response['sessionKey']}, expires_delta=expires)
             return make_response(jsonify(access_token=access_token, sessionKey=response['sessionKey']), 200)
