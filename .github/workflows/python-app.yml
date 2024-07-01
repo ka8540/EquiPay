@@ -47,7 +47,13 @@ jobs:
 
       - name: Set FLASK_APP environment variable
         run: echo "FLASK_APP=src/server.py" >> $GITHUB_ENV
-      
+
+      - name: Set Codecov token environment variable
+        run: echo "CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }}" >> $GITHUB_ENV
+
+      - name: Verify Codecov token
+        run: echo "Codecov token is ${{ secrets.CODECOV_TOKEN }}"
+
       - name: List files in the src directory
         run: ls -alh
         working-directory: ${{ github.workspace }}/equipay/server/src
@@ -67,9 +73,6 @@ jobs:
           coverage report -m
         working-directory: ${{ github.workspace }}/equipay/server
         
-      - name: Print environment variables
-        run: printenv
-
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4.0.1
         with:
