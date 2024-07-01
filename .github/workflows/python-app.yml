@@ -22,8 +22,15 @@ jobs:
           POSTGRES_PASSWORD: kl,.
         ports:
           - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U SWEN732"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v2
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -34,6 +41,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r equipay/server/requirements.txt
           pip install coverage
+          
       - name: Set PYTHONPATH
         run: echo "PYTHONPATH=${{ github.workspace }}/equipay/server/src" >> $GITHUB_ENV
 
@@ -49,6 +57,7 @@ jobs:
         env:
           FLASK_ENV: development
         working-directory: ${{ github.workspace }}/equipay/server/src
+        
       - name: Delay for Flask server to start
         run: sleep 5
 
