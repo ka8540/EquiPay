@@ -1,5 +1,5 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
+[![codecov](https://codecov.io/gh/ka8540/EquiPay/graph/badge.svg?token=CE0ICTBQMR)](https://codecov.io/gh/ka8540/EquiPay)
 # EquiPay
 
 ## Project Definition
