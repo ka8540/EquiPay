@@ -2,10 +2,10 @@ name: Python application
 
 on:
   push:
-    branches: 
+    branches:
       - "*"  # Run on all branches for any push events
   pull_request:
-    branches: 
+    branches:
       - "*"  # Run on all branches for any pull request events
 
 permissions:
@@ -68,11 +68,11 @@ jobs:
       - name: Generate coverage report
         run: |
           coverage run -m unittest discover tests
-          coverage report -m
+          coverage xml -o coverage.xml  # Generate XML coverage report
         working-directory: ${{ github.workspace }}/equipay/server
         
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4.0.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          run: codecov do-upload -t ${{ secrets.CODECOV_TOKEN }} -f coverage.xml
+          files: coverage.xml  # Specify the coverage report file
