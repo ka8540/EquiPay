@@ -41,6 +41,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r equipay/server/requirements.txt
           pip install coverage
+
+      - name: Install Codecov CLI
+        run: |
+          curl -Os https://cli.codecov.io/latest/linux/codecov
+          chmod +x codecov
+          sudo mv codecov /usr/local/bin/
           
       - name: Set environment variables
         run: |
