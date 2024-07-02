@@ -70,4 +70,4 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           name: coverage-report
-          path: coverage.xml  # Ensure this path is correct
+          file: equipay/server/coverage.xml  
