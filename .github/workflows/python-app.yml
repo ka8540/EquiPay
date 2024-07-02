@@ -1,3 +1,14 @@
+on:
+  push:
+    branches: 
+      - "*"  # Run on all branches for any push events
+  pull_request:
+    branches: 
+      - "*"  # Run on all branches for any pull request events
+
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
