@@ -22,8 +22,6 @@ class TestFriendsFunctions(unittest.TestCase):
             '''SELECT 1 FROM Friends WHERE (UserID = %s AND FriendUserID = %s);''', (1, friend_id)
         )
 
-
-
     @patch('src.db.friends.exec_get_all')  # Adjust the patch target based on your project structure
     def test_get_friend_requests_success(self, mock_exec_get_all):
         mock_exec_get_all.return_value = [(1, 'Friend1'), (2, 'Friend2')]
