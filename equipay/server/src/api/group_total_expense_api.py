@@ -1,4 +1,4 @@
-from flask import jsonify
+from flask import jsonify,make_response
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from db.group import get_group_debts, calculate_group_amount_owed
@@ -10,7 +10,7 @@ class TotalGroupAmountAPI(Resource):
         current_user_username = get_jwt_identity()['username']
         user_id = get_user_id(current_user_username)
         if not user_id:
-            return jsonify({"message": "User not found"}), 404
+            return make_response(jsonify({"message": "User not found"}), 404)
 
         debts = get_group_debts(group_id,user_id)
         results = []
@@ -40,7 +40,7 @@ class TotalGroupAmountAPIbyID(Resource):
         current_user_username = get_jwt_identity()['username']
         user_id = get_user_id(current_user_username)
         if not user_id:
-            return jsonify({"message": "User not found"}), 404
+            return make_response(jsonify({"message": "User not found"}), 404)
         print("user_id:",user_id)
         print("friend_id:",friend_id)
         result1 = calculate_group_amount_owed(group_id, user_id, friend_id)

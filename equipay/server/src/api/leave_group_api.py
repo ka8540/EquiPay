@@ -12,7 +12,7 @@ class LeaveGroupAPI(Resource):
 
         user_id = get_user_id(current_user_username)
         if not user_id:
-            return jsonify({"message": "User not found"}), 404
+            return make_response(jsonify({"message": "User not found"}), 404)
         
         group = leave_group(user_id,group_id)
         if not group:
