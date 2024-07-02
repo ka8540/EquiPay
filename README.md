@@ -103,6 +103,6 @@ EquiPay leverages a robust stack of modern technologies to provide a seamless an
 - **Database**: Utilizes **AWS PostgreSQL RDS** for secure and scalable data storage, ensuring high availability and performance.
 - **Document Processing**: Integrates **AWS Textract** for advanced text extraction from images, aiding in automated data entry from uploaded receipts.
 - **Image Storage**: Uses **AWS S3** for secure and durable storage of images and documents, allowing efficient retrieval and management.
-- **Orchestration and Scaling**: Employing **AWS Kubernetes** with a LoadBalancer to manage containerized application deployment, ensuring scalability and resilience.
+- **Orchestration and Scaling**: Utilizing **Terraform** to deploy Docker containers directly on **AWS EC2**, streamlining deployment and operational efficiency.
 
 This combination of technologies ensures that EquiPay can handle complex operations efficiently, from user management to real-time data processing and analytics.
