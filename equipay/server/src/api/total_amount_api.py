@@ -1,4 +1,4 @@
-from flask import jsonify, request
+from flask import jsonify, request, make_response
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from db.amoutowed import calculate_amount_owed, get_user_id , get_user_debts
@@ -15,7 +15,7 @@ class TotalAmountAPIbyID(Resource):
         print("User_ID:", user_id_results)
         if not user_id_results:
             print("No user found with username:", current_user_id)
-            return jsonify({"message": "User not found"}), 404
+            return make_response(jsonify({"message": "User not found"}), 404)
         user_id = user_id_results[0]
         print("user_id:", user_id)
         print(f"Calculating total amount for user ID {user_id} with friend ID {friend_id}")
@@ -42,7 +42,7 @@ class TotalAmountAPI(Resource):
 
         user_id = get_user_id(current_user_username)
         if not user_id:
-            return jsonify({"message": "User not found"}), 404
+            return make_response(jsonify({"message": "User not found"}), 404)
 
         debts = get_user_debts(user_id)
         results = [] 
