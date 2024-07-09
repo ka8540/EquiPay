@@ -3,7 +3,7 @@ from flask_restful import Resource, reqparse
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from db.amoutowed import get_user_id
 from db.delete_group import add_member_in_group, check_total_members, check_member 
-
+from db.graph import get_session_key
 class AddGroupMembersAPI(Resource):
     @jwt_required()
     def put(self,group_id):
@@ -13,6 +13,10 @@ class AddGroupMembersAPI(Resource):
         user_id = get_user_id(current_user_username)
         if not user_id:
             return make_response(jsonify({"message": "User not found"}), 404)
+        
+        session_key = get_session_key(user_id)
+        if not session_key:
+            return make_response(jsonify({"message":"User is not Logged In"}),401)
         
         parser = reqparse.RequestParser()
         parser.add_argument('friend_id', type=int, required=True, help="Friend ID cannot be blank!")

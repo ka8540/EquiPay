@@ -2,7 +2,7 @@ from flask import jsonify, request, make_response
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from db.amoutowed import get_user_id 
-from db.graph import get_graph_values 
+from db.graph import get_graph_values , get_session_key
 
 class GraphAPI(Resource):
     @jwt_required()
@@ -11,9 +11,14 @@ class GraphAPI(Resource):
         user_id = get_user_id(current_user)
         if not user_id:
             return make_response(jsonify({"message": "User not found"}), 404)
-        
+        session_key = get_session_key(user_id)
+        if not session_key:
+            return make_response(jsonify({"message":"User is not Logged In"}),401)
         graph_values = get_graph_values(user_id)
         if not graph_values:
             return make_response(jsonify({"message": "Graph data is empty"}), 201)
         
         return jsonify(graph_values)
+    
+
+            

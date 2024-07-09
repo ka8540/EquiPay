@@ -118,7 +118,6 @@ api.add_resource(ContactListAPI, '/contact_list')
 api.add_resource(DeleteGroupAPI, '/delete_group/<int:group_id>')
 api.add_resource(LeaveGroupAPI, '/leave_group/<int:group_id>')
 api.add_resource(AddGroupMembersAPI, '/add_group_member/<int:group_id>')
-
 def setup_database():
     print("Loading db")
     exec_sql_file('data/data.sql')

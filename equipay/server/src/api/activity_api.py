@@ -3,7 +3,7 @@ from flask_restful import Resource, reqparse
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from db.amoutowed import get_user_id 
 from db.activity import get_items_for_activity
-
+from db.graph import get_session_key
 class ActivityAPI(Resource):
     @jwt_required()
     def get(self):
@@ -11,7 +11,9 @@ class ActivityAPI(Resource):
         user_id = get_user_id(current_user)
         if not user_id:
             return make_response(jsonify({"message": "User not found"}), 404)
-
+        session_key = get_session_key(user_id)
+        if not session_key:
+            return make_response(jsonify({"message":"User is not Logged In"}),401)
         result = get_items_for_activity(user_id)
         if not result:
             return jsonify({"message": "No Logs Found", "logs": []})
