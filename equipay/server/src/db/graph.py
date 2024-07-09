@@ -19,7 +19,7 @@ def get_graph_values(user_id):
         e.Date AS Date
     FROM Debts d
     JOIN Expenses e ON d.ExpenseID = e.ExpenseID
-    WHERE d.OwedByUserID = %s;
+    WHERE d.OwedByUserID = %s AND d.OwedToUserID <> d.OwedByUserID; 
     '''
     results = exec_get_all(query, (user_id, user_id, user_id))
     print("Combined Graph Values:", results)

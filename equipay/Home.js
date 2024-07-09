@@ -145,10 +145,14 @@ export default function Home({ navigation }) {
           return acc;
         }, {});
 
-        // Convert the object back to arrays for labels and data
-        const sortedDates = Object.keys(totalsByDate).sort();
-        const labels = sortedDates.map(date => moment(date, 'YYYY-MM-DD').format('MMM D'));
-        const data = sortedDates.map(date => totalsByDate[date]);
+        // Create an array from the totals object, then sort by date
+        const sortedDataPoints = Object.entries(totalsByDate)
+          .map(([date, value]) => ({ date, value }))
+          .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        // Now map the sorted data to labels and data arrays
+        const labels = sortedDataPoints.map(dp => moment(dp.date, 'YYYY-MM-DD').format('MM/D'));
+        const data = sortedDataPoints.map(dp => dp.value);
 
         console.log("Aggregated Data Points:", { labels, data });
 
@@ -163,7 +167,6 @@ export default function Home({ navigation }) {
     }
 };
 
-  
   
 
   const renderItem = ({ item }) => (
