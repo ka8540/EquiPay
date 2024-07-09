@@ -21,10 +21,25 @@ class TestGraphFunctions(unittest.TestCase):
         self.assertEqual(result, expected_result)
         mock_exec_get_all.assert_called_once_with(
             '''
-    SELECT amount, date FROM Expenses WHERE PayerID = %s
+    SELECT amount AS Amount, date AS Date
+    FROM Expenses
+    WHERE PayerID = %s
+
     UNION ALL
-    SELECT amount, date FROM GroupExpenses WHERE PayerID = %s;
-    ''', (user_id, user_id)
+
+    SELECT amount AS Amount, date AS Date
+    FROM GroupExpenses
+    WHERE PayerID = %s
+
+    UNION ALL
+
+    SELECT 
+        d.AmountOwed AS Amount, 
+        e.Date AS Date
+    FROM Debts d
+    JOIN Expenses e ON d.ExpenseID = e.ExpenseID
+    WHERE d.OwedByUserID = %s;
+    ''', (user_id, user_id, user_id)
         )
 
 if __name__ == '__main__':
