@@ -7,38 +7,71 @@ import * as Contacts from 'expo-contacts';
 const AddFriends = ({ navigation }) => {
   const [users, setUsers] = useState([]);
   const [pendingRequests, setPendingRequests] = useState([]);
+  const [matchedContacts, setMatchedContacts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchData();
+    fetchDeviceContacts();
   }, []);
 
   const fetchDeviceContacts = async () => {
     const { status } = await Contacts.requestPermissionsAsync();
     if (status === 'granted') {
       const { data } = await Contacts.getContactsAsync({
-        fields: [Contacts.Fields.Emails, Contacts.Fields.Name],
+        fields: [Contacts.Fields.Emails, Contacts.Fields.PhoneNumbers, Contacts.Fields.Name],
       });
-  
+
       if (data.length > 0) {
-        return data.map(contact => ({
+        const deviceContacts = data.map(contact => ({
           id: contact.id,
           name: contact.name,
           email: contact.emails?.[0]?.email,
+          phoneNumber: normalizePhoneNumber(contact.phoneNumbers?.[0]?.number),
         }));
+        matchContacts(deviceContacts);
       }
     }
-    return [];
   };
-  
-  useEffect(() => {
-    const loadContacts = async () => {
-      const deviceContacts = await fetchDeviceContacts();
-      setUsers(prevUsers => [...prevUsers, ...deviceContacts]);
-    };
-  
-    loadContacts();
-  }, []);
+
+  const normalizePhoneNumber = (phoneNumber) => {
+    if (!phoneNumber) return '';
+    return phoneNumber.replace(/[^\d]/g, '');
+  };
+
+  const matchContacts = async (deviceContacts) => {
+    try {
+      const sessionKey = await AsyncStorage.getItem('sessionKey');
+      const token = await AsyncStorage.getItem('jwt_token');
+
+      const response = await axios.get('http://127.0.0.1:5000/contact_list', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Session-Key': sessionKey,
+        },
+      });
+
+      const serverContacts = response.data.map(contact => ({
+        firstname: contact.firstname,
+        phoneNumber: normalizePhoneNumber(contact.contact)
+      }));
+
+      console.log("Contacts:", serverContacts);
+      const matchedContacts = deviceContacts.filter(deviceContact =>
+        serverContacts.some(serverContact => serverContact.phoneNumber === deviceContact.phoneNumber)
+      ).map(matchedContact => ({
+        ...matchedContact,
+        firstname: serverContacts.find(serverContact => serverContact.phoneNumber === matchedContact.phoneNumber)?.firstname
+      }));
+
+      console.log("deviceContacts:", deviceContacts);
+      console.log("Matched Contacts:", matchedContacts);
+      setMatchedContacts(matchedContacts);
+    } catch (error) {
+      console.error('Error matching contacts:', error);
+      Alert.alert('Error', 'Failed to match contacts');
+    }
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -100,7 +133,7 @@ const AddFriends = ({ navigation }) => {
           'Session-Key': sessionKey,
         },
       });
-      console.log("Response:",response);
+      console.log("Response:", response);
       if (response.status === 200) {
         Alert.alert("Success", `Friend request ${action}ed successfully!`);
         setPendingRequests(prevRequests => 
@@ -111,20 +144,27 @@ const AddFriends = ({ navigation }) => {
       Alert.alert('Error', `Failed to update friend request: ${error.response ? error.response.data.message : error.message}`);
     }
   };
-  
+
   const renderItem = ({ item }) => (
     <TouchableOpacity style={styles.item} onPress={() => handleAddFriend(item)}>
-      <Text style={styles.title}>{item.name}</Text>
+      <Text style={styles.title}>{item.firstname || item.name}</Text>
     </TouchableOpacity>
   );
 
   const handleAddFriend = (user) => {
+    const matchedUser = users.find(u => u.name === user.firstname);
+    const userId = matchedUser ? matchedUser.id : null;
+    if (!userId) {
+      Alert.alert('Error', 'User ID not found');
+      return;
+    }
+
     Alert.alert(
       "Add Friend",
       `Do you really want to add ${user.name} to your friend list?`,
       [
         { text: "Cancel", style: "cancel" },
-        { text: "Yes", onPress: () => sendFriendRequest(user.id) }
+        { text: "Yes", onPress: () => sendFriendRequest(userId) }
       ]
     );
   };
@@ -149,7 +189,7 @@ const AddFriends = ({ navigation }) => {
         Alert.alert("Success", "Friend request sent successfully!");
         fetchData(); 
       }
-    } catch ( error ) {
+    } catch (error) {
       if (error.response) {
         if (error.response.status === 409) {
           Alert.alert("Notice", "Friend request already sent.");
@@ -161,7 +201,7 @@ const AddFriends = ({ navigation }) => {
       }
     }
   };
-  
+
   const renderPendingRequestItem = ({ item }) => (
     <View style={styles.item}>
       <Text style={styles.title}>{item.name}</Text>
@@ -169,7 +209,6 @@ const AddFriends = ({ navigation }) => {
       <Button title="Reject" onPress={() => handleResponse(item.id, 'reject')} />
     </View>
   );
-  
 
   return (
     <View style={styles.container}>
@@ -179,19 +218,18 @@ const AddFriends = ({ navigation }) => {
         <>
           <Text style={styles.header}>People</Text>
           <FlatList
-            data={users}
+            data={matchedContacts}
             keyExtractor={(item) => item.id.toString()}
             renderItem={renderItem}
             contentContainerStyle={styles.list}
-            />
-           <Text style={styles.header}>Pending Request</Text> 
-            <FlatList
+          />
+          <Text style={styles.header}>Pending Request</Text>
+          <FlatList
             data={pendingRequests}
             keyExtractor={(item) => item.id}
             renderItem={renderPendingRequestItem}
             contentContainerStyle={styles.list}
-            />
-
+          />
         </>
       )}
     </View>
