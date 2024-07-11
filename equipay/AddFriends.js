@@ -5,9 +5,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Contacts from 'expo-contacts';
 
 const AddFriends = ({ navigation }) => {
-  const [users, setUsers] = useState([]);
-  const [pendingRequests, setPendingRequests] = useState([]);
   const [matchedContacts, setMatchedContacts] = useState([]);
+  const [pendingRequests, setPendingRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,15 +18,13 @@ const AddFriends = ({ navigation }) => {
     const { status } = await Contacts.requestPermissionsAsync();
     if (status === 'granted') {
       const { data } = await Contacts.getContactsAsync({
-        fields: [Contacts.Fields.Emails, Contacts.Fields.PhoneNumbers, Contacts.Fields.Name],
+        fields: [Contacts.Fields.Name, Contacts.Fields.PhoneNumbers],
       });
 
       if (data.length > 0) {
         const deviceContacts = data.map(contact => ({
-          id: contact.id,
-          name: contact.name,
-          email: contact.emails?.[0]?.email,
-          phoneNumber: normalizePhoneNumber(contact.phoneNumbers?.[0]?.number),
+          firstname: contact.name,
+          contact: normalizePhoneNumber(contact.phoneNumbers?.[0]?.number),
         }));
         matchContacts(deviceContacts);
       }
@@ -49,24 +46,18 @@ const AddFriends = ({ navigation }) => {
           'Authorization': `Bearer ${token}`,
           'Session-Key': sessionKey,
         },
+        params: {
+          contacts: encodeURIComponent(JSON.stringify(deviceContacts)),
+        },
       });
 
       const serverContacts = response.data.map(contact => ({
-        firstname: contact.firstname,
-        phoneNumber: normalizePhoneNumber(contact.contact)
+        user_id: contact[0],
+        firstname: contact[1]
       }));
-
-      console.log("Contacts:", serverContacts);
-      const matchedContacts = deviceContacts.filter(deviceContact =>
-        serverContacts.some(serverContact => serverContact.phoneNumber === deviceContact.phoneNumber)
-      ).map(matchedContact => ({
-        ...matchedContact,
-        firstname: serverContacts.find(serverContact => serverContact.phoneNumber === matchedContact.phoneNumber)?.firstname
-      }));
-
-      console.log("deviceContacts:", deviceContacts);
-      console.log("Matched Contacts:", matchedContacts);
-      setMatchedContacts(matchedContacts);
+      
+      console.log("Response:", serverContacts);
+      setMatchedContacts(serverContacts);
     } catch (error) {
       console.error('Error matching contacts:', error);
       Alert.alert('Error', 'Failed to match contacts');
@@ -85,13 +76,6 @@ const AddFriends = ({ navigation }) => {
     }
 
     try {
-      const userResponse = await axios.get('http://127.0.0.1:5000/listUsers', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Session-Key': sessionKey,
-        },
-      });
-
       const pendingResponse = await axios.get('http://127.0.0.1:5000/addFriend', {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -99,18 +83,11 @@ const AddFriends = ({ navigation }) => {
         },
       });
 
-      const transformedUsers = userResponse.data.map(user => ({
-        id: user[0], 
-        name: user[1],
-        email: user[3],
+      const transformedRequests = pendingResponse.data.map(request => ({
+        id: request[0],
+        firstname: request[1],
       }));
 
-      const transformedRequests = pendingResponse.data.map((user, index) => ({
-        id: user[0],
-        name: user[1],
-      }));
-
-      setUsers(transformedUsers);
       setPendingRequests(transformedRequests);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -120,51 +97,13 @@ const AddFriends = ({ navigation }) => {
     }
   };
 
-  const handleResponse = async (friendId, action) => {
-    const sessionKey = await AsyncStorage.getItem('sessionKey');
-    const token = await AsyncStorage.getItem('jwt_token');
-    try {
-      const response = await axios.put('http://127.0.0.1:5000/addFriend', {
-        friend_id: friendId, 
-        action: action
-      }, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Session-Key': sessionKey,
-        },
-      });
-      console.log("Response:", response);
-      if (response.status === 200) {
-        Alert.alert("Success", `Friend request ${action}ed successfully!`);
-        setPendingRequests(prevRequests => 
-          prevRequests.filter(req => req.id !== friendId)
-        );
-      }
-    } catch (error) {
-      Alert.alert('Error', `Failed to update friend request: ${error.response ? error.response.data.message : error.message}`);
-    }
-  };
-
-  const renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.item} onPress={() => handleAddFriend(item)}>
-      <Text style={styles.title}>{item.firstname || item.name}</Text>
-    </TouchableOpacity>
-  );
-
   const handleAddFriend = (user) => {
-    const matchedUser = users.find(u => u.name === user.firstname);
-    const userId = matchedUser ? matchedUser.id : null;
-    if (!userId) {
-      Alert.alert('Error', 'User ID not found');
-      return;
-    }
-
     Alert.alert(
       "Add Friend",
-      `Do you really want to add ${user.name} to your friend list?`,
+      `Do you really want to add ${user.firstname} to your friend list?`,
       [
         { text: "Cancel", style: "cancel" },
-        { text: "Yes", onPress: () => sendFriendRequest(userId) }
+        { text: "Yes", onPress: () => sendFriendRequest(user.user_id) }
       ]
     );
   };
@@ -202,9 +141,40 @@ const AddFriends = ({ navigation }) => {
     }
   };
 
+  const renderItem = ({ item }) => (
+    <TouchableOpacity style={styles.item} onPress={() => handleAddFriend(item)}>
+      <Text style={styles.title}>{item.firstname}</Text>
+    </TouchableOpacity>
+  );
+
+  const handleResponse = async (friendId, action) => {
+    const sessionKey = await AsyncStorage.getItem('sessionKey');
+    const token = await AsyncStorage.getItem('jwt_token');
+    try {
+      const response = await axios.put('http://127.0.0.1:5000/addFriend', {
+        friend_id: friendId, 
+        action: action
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Session-Key': sessionKey,
+        },
+      });
+      console.log("Response:", response);
+      if (response.status === 200) {
+        Alert.alert("Success", `Friend request ${action}ed successfully!`);
+        setPendingRequests(prevRequests => 
+          prevRequests.filter(req => req.id !== friendId)
+        );
+      }
+    } catch (error) {
+      Alert.alert('Error', `Failed to update friend request: ${error.response ? error.response.data.message : error.message}`);
+    }
+  };
+
   const renderPendingRequestItem = ({ item }) => (
     <View style={styles.item}>
-      <Text style={styles.title}>{item.name}</Text>
+      <Text style={styles.title}>{item.firstname}</Text>
       <Button title="Accept" onPress={() => handleResponse(item.id, 'accept')} />
       <Button title="Reject" onPress={() => handleResponse(item.id, 'reject')} />
     </View>
@@ -219,14 +189,14 @@ const AddFriends = ({ navigation }) => {
           <Text style={styles.header}>People</Text>
           <FlatList
             data={matchedContacts}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item) => item.user_id ? item.user_id.toString() : Math.random().toString()}
             renderItem={renderItem}
             contentContainerStyle={styles.list}
           />
-          <Text style={styles.header}>Pending Request</Text>
+          <Text style={styles.header}>Pending Requests</Text>
           <FlatList
             data={pendingRequests}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.id ? item.id.toString() : Math.random().toString()}
             renderItem={renderPendingRequestItem}
             contentContainerStyle={styles.list}
           />
