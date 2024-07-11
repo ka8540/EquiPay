@@ -38,48 +38,53 @@ const AddFriends = ({ navigation }) => {
 
   const matchContacts = async (deviceContacts) => {
     try {
-        const sessionKey = await AsyncStorage.getItem('sessionKey');
-        const token = await AsyncStorage.getItem('jwt_token');
-
-        // Encode the entire contacts list
-        const encodedContacts = encodeURIComponent(JSON.stringify(deviceContacts));
-
+      const sessionKey = await AsyncStorage.getItem('sessionKey');
+      const token = await AsyncStorage.getItem('jwt_token');
+  
+      const batchSize = 50;
+      for (let i = 0; i < deviceContacts.length; i += batchSize) {
+        const batch = deviceContacts.slice(i, i + batchSize);
+  
+        const encodedContacts = encodeURIComponent(JSON.stringify(batch));
+  
         const response = await axios.post('http://127.0.0.1:5000/contact_list', {}, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Session-Key': sessionKey,
-            },
-            params: {
-                contacts: encodedContacts,
-            },
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Session-Key': sessionKey,
+          },
+          params: {
+            contacts: encodedContacts,
+          },
         });
-
+  
         console.log(`Response Status: ${response.status}`, response.data);
-
+  
         if (response.status === 201) {
-            // Silently handle the 201 status
+          // Silently handle the 201 status
+          continue;
         } else if (response.status === 200) {
-            // Process and display first names if status is 200
-            if (Array.isArray(response.data)) {
-                const serverContacts = response.data.map(contact => ({
-                    user_id: contact[0],
-                    firstname: contact[1]
-                }));
-                console.log("Batch Response:", serverContacts);
-                setMatchedContacts(serverContacts); // Set or update the matched contacts
-            }
+          // Process and display first names if status is 200
+          if (Array.isArray(response.data)) {
+            const serverContacts = response.data.map(contact => ({
+              user_id: contact[0],
+              firstname: contact[1]
+            }));
+            console.log("Batch Response:", serverContacts);
+            setMatchedContacts(prevContacts => [...prevContacts, ...serverContacts]); // Append new matched contacts
+          }
         } else {
-            // Handle other statuses
-            console.error("Failed request:", response);
-            Alert.alert('Error', `Unexpected server response with status: ${response.status}`);
+          // Handle other statuses
+          console.error("Failed request:", response);
+          Alert.alert('Error', `Unexpected server response with status: ${response.status}`);
         }
-
+      }
+  
     } catch (error) {
-        console.error('Error matching contacts:', error);
-        Alert.alert('Error', 'Failed to match contacts');
+      console.error('Error matching contacts:', error);
+      Alert.alert('Error', 'Failed to match contacts');
     }
-};
-
+  };
+  
   
   const fetchData = async () => {
     setLoading(true);
@@ -93,7 +98,7 @@ const AddFriends = ({ navigation }) => {
     }
 
     try {
-      const pendingResponse = await axios.get('http://127.0.0.1:5000/addFriend', {
+      const pendingResponse = await axios.get('http://app-lb-1060939863.us-east-1.elb.amazonaws.com/addFriend', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Session-Key': sessionKey,
@@ -135,7 +140,7 @@ const AddFriends = ({ navigation }) => {
     }
 
     try {
-      const response = await axios.post('http://127.0.0.1:5000/addFriend', { friend_id: friendId }, {
+      const response = await axios.post('http://app-lb-1060939863.us-east-1.elb.amazonaws.com/addFriend', { friend_id: friendId }, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Session-Key': sessionKey,
@@ -168,7 +173,7 @@ const AddFriends = ({ navigation }) => {
     const sessionKey = await AsyncStorage.getItem('sessionKey');
     const token = await AsyncStorage.getItem('jwt_token');
     try {
-      const response = await axios.put('http://127.0.0.1:5000/addFriend', {
+      const response = await axios.put('http://app-lb-1060939863.us-east-1.elb.amazonaws.com/addFriend', {
         friend_id: friendId, 
         action: action
       }, {
