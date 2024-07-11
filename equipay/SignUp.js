@@ -15,7 +15,17 @@ export default function SignUp({ navigation }) {
     navigation.navigate('Login');
   };
 
+  const validateContact = (number) => {
+    // Check if number starts with '+' and contains exactly 11 to 15 digits
+    const regex = /^\+[1-9]{1}[0-9]{10,14}$/;
+    return regex.test(number);
+  };
+
   const handleSubmit = () => {
+    if (!validateContact(contactNumber)) {
+      Alert.alert("Invalid Contact", "Please include a valid country code and number.");
+      return;
+    }
     if (password !== confirmpassword) {
       Alert.alert("Password Mismatch", "The passwords do not match. Please try again.");
       return;
@@ -25,10 +35,10 @@ export default function SignUp({ navigation }) {
       return;
     }
     if (!email.includes('@')) {
-      Alert.alert("Invalid Email", "Email should contain @.");
+      Alert.alert("Invalid Email", "Email should contain '@'.");
       return;
     }
-    
+
     const url = 'http://127.0.0.1:5000/signUp';
     const formData = {
       firstname: firstname,
@@ -37,10 +47,9 @@ export default function SignUp({ navigation }) {
       username: username,
       password: password,
       confirmpassword: confirmpassword,
-      contact_number: contactNumber,  // Add this line
+      contact_number: contactNumber,
     };
     
-
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -117,7 +126,14 @@ export default function SignUp({ navigation }) {
           style={styles.input}
           placeholder="Contact Number"
           value={contactNumber}
-          onChangeText={setContactNumber}
+          onChangeText={(text) => {
+            // Only prepend '+' if it's not already there
+            if (!text.startsWith('+')) {
+              setContactNumber(`+${text}`);
+            } else {
+              setContactNumber(text);
+            }
+          }}
           keyboardType="phone-pad"
         />
 
@@ -132,7 +148,7 @@ export default function SignUp({ navigation }) {
 
         <TextInput
           style={styles.input}
-          placeholder="ConfirmPassword"
+          placeholder="Confirm Password"
           value={confirmpassword}
           onChangeText={setConfirmPassword}
           keyboardType="default" 
@@ -144,7 +160,7 @@ export default function SignUp({ navigation }) {
         </TouchableOpacity>
         
         <Text style={styles.signupPrompt}>
-          Already have an Account? <Text onPress={navigateToLogin} style={styles.signupLink}>SignIn</Text>
+          Already have an Account? <Text onPress={navigateToLogin} style={styles.signupLink}>Sign In</Text>
         </Text>
       </View>
     </SafeAreaView>

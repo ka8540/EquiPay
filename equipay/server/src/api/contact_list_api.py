@@ -8,7 +8,7 @@ from db.amoutowed import get_user_id
 
 class ContactListAPI(Resource):
     @jwt_required()
-    def get(self):
+    def post(self):
         jwt_user = get_jwt_identity()
         user_id = get_user_id(jwt_user['username'])
         

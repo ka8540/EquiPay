@@ -38,32 +38,49 @@ const AddFriends = ({ navigation }) => {
 
   const matchContacts = async (deviceContacts) => {
     try {
-      const sessionKey = await AsyncStorage.getItem('sessionKey');
-      const token = await AsyncStorage.getItem('jwt_token');
+        const sessionKey = await AsyncStorage.getItem('sessionKey');
+        const token = await AsyncStorage.getItem('jwt_token');
 
-      const response = await axios.get('http://127.0.0.1:5000/contact_list', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Session-Key': sessionKey,
-        },
-        params: {
-          contacts: encodeURIComponent(JSON.stringify(deviceContacts)),
-        },
-      });
+        // Encode the entire contacts list
+        const encodedContacts = encodeURIComponent(JSON.stringify(deviceContacts));
 
-      const serverContacts = response.data.map(contact => ({
-        user_id: contact[0],
-        firstname: contact[1]
-      }));
-      
-      console.log("Response:", serverContacts);
-      setMatchedContacts(serverContacts);
+        const response = await axios.post('http://127.0.0.1:5000/contact_list', {}, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Session-Key': sessionKey,
+            },
+            params: {
+                contacts: encodedContacts,
+            },
+        });
+
+        console.log(`Response Status: ${response.status}`, response.data);
+
+        if (response.status === 201) {
+            // Silently handle the 201 status
+        } else if (response.status === 200) {
+            // Process and display first names if status is 200
+            if (Array.isArray(response.data)) {
+                const serverContacts = response.data.map(contact => ({
+                    user_id: contact[0],
+                    firstname: contact[1]
+                }));
+                console.log("Batch Response:", serverContacts);
+                setMatchedContacts(serverContacts); // Set or update the matched contacts
+            }
+        } else {
+            // Handle other statuses
+            console.error("Failed request:", response);
+            Alert.alert('Error', `Unexpected server response with status: ${response.status}`);
+        }
+
     } catch (error) {
-      console.error('Error matching contacts:', error);
-      Alert.alert('Error', 'Failed to match contacts');
+        console.error('Error matching contacts:', error);
+        Alert.alert('Error', 'Failed to match contacts');
     }
-  };
+};
 
+  
   const fetchData = async () => {
     setLoading(true);
     const sessionKey = await AsyncStorage.getItem('sessionKey');

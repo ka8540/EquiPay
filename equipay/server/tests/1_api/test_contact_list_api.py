@@ -21,7 +21,7 @@ class TestContactListAPI(unittest.TestCase):
 
     @patch('src.api.contact_list_api.get_user_id')
     @patch('src.api.contact_list_api.check_contacts_exist')
-    def test_get_contacts_success(self, mock_check_contacts_exist, mock_get_user_id):
+    def test_post_contacts_success(self, mock_check_contacts_exist, mock_get_user_id):
         mock_get_user_id.return_value = 1
         mock_check_contacts_exist.return_value = [
             {"firstname": "John Doe", "contact": "123-456-7890"},
@@ -30,7 +30,7 @@ class TestContactListAPI(unittest.TestCase):
 
         headers = {'Authorization': f'Bearer {self.get_valid_token()}'}
         contacts_json = '[{"firstname": "John Doe", "contact": "123-456-7890"}, {"firstname": "Jane Doe", "contact": "098-765-4321"}]'
-        response = self.client.get('/contacts', headers=headers, query_string={'contacts': contacts_json})
+        response = self.client.post('/contacts', headers=headers, query_string={'contacts': contacts_json})
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, [
@@ -39,24 +39,23 @@ class TestContactListAPI(unittest.TestCase):
         ])
 
     @patch('src.api.contact_list_api.get_user_id')
-    def test_get_contacts_user_not_found(self, mock_get_user_id):
+    def test_post_contacts_user_not_found(self, mock_get_user_id):
         mock_get_user_id.return_value = None
 
         headers = {'Authorization': f'Bearer {self.get_valid_token()}'}
         contacts_json = '[{"firstname": "John Doe", "contact": "123-456-7890"}, {"firstname": "Jane Doe", "contact": "098-765-4321"}]'
-        response = self.client.get('/contacts', headers=headers, query_string={'contacts': contacts_json})
+        response = self.client.post('/contacts', headers=headers, query_string={'contacts': contacts_json})
 
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json, {"message": "User not found"})
 
-
     @patch('src.api.contact_list_api.get_user_id')
-    def test_get_contacts_invalid_json_format(self, mock_get_user_id):
+    def test_post_contacts_invalid_json_format(self, mock_get_user_id):
         mock_get_user_id.return_value = 1
 
         headers = {'Authorization': f'Bearer {self.get_valid_token()}'}
         invalid_contacts_json = 'invalid-json'
-        response = self.client.get('/contacts', headers=headers, query_string={'contacts': invalid_contacts_json})
+        response = self.client.post('/contacts', headers=headers, query_string={'contacts': invalid_contacts_json})
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json, {"message": "Invalid JSON format"})
