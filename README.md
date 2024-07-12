@@ -1,5 +1,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![codecov](https://codecov.io/gh/ka8540/EquiPay/graph/badge.svg?token=CE0ICTBQMR)](https://codecov.io/gh/ka8540/EquiPay)
+
 # EquiPay
 
 ## Project Definition
@@ -43,6 +44,18 @@ This application aims to simplify the management of shared expenses and personal
 - **Better UI/UX of Login/Signup Page for Secure Signup**: Delivers a seamless, intuitive login and signup experience, emphasizing user-friendly design and enhanced security measures to protect user data and simplify the entry process.
 
 Each feature is designed to offer a comprehensive solution for managing shared expenses effortlessly, reflecting our commitment to providing an intuitive and functional financial tool.
+
+### Forecast Feature
+
+The Forecast feature in the EquiPay application uses linear regression to predict future expenses based on a user's historical financial data. This allows users to see estimated expenses for up to six months ahead, helping with financial planning and budget management.
+
+#### Functionality
+
+- **Data Processing**: Historical expense data is collected and processed to form the input for the model.
+- **Prediction Model**: A linear regression model is used to predict future expenses based on the trends observed in the historical data.
+- **Output**: The feature outputs the predicted expense amounts for the next six months, presented in a monthly breakdown.
+
+![Forecast Page](equipay/images/Forecast.png)
 
 ## Application Page Overviews
 
