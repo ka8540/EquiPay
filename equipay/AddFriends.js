@@ -98,7 +98,7 @@ const AddFriends = ({ navigation }) => {
     }
 
     try {
-      const pendingResponse = await axios.get('http://app-lb-1060939863.us-east-1.elb.amazonaws.com/addFriend', {
+      const pendingResponse = await axios.get('http://127.0.0.1:5000/addFriend', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Session-Key': sessionKey,
@@ -140,7 +140,7 @@ const AddFriends = ({ navigation }) => {
     }
 
     try {
-      const response = await axios.post('http://app-lb-1060939863.us-east-1.elb.amazonaws.com/addFriend', { friend_id: friendId }, {
+      const response = await axios.post('http://127.0.0.1:5000/addFriend', { friend_id: friendId }, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Session-Key': sessionKey,
@@ -173,7 +173,7 @@ const AddFriends = ({ navigation }) => {
     const sessionKey = await AsyncStorage.getItem('sessionKey');
     const token = await AsyncStorage.getItem('jwt_token');
     try {
-      const response = await axios.put('http://app-lb-1060939863.us-east-1.elb.amazonaws.com/addFriend', {
+      const response = await axios.put('http://127.0.0.1:5000/addFriend', {
         friend_id: friendId, 
         action: action
       }, {

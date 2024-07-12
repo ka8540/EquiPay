@@ -7,6 +7,8 @@ import { LineChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
 import Speedometer from 'react-native-speedometer-chart';
 import moment from 'moment';
+import { PieChart } from 'react-native-svg-charts'
+import * as shape from 'd3-shape'
 
 const MySpeedometer = ({ netAmount = 0 }) => {
   const absoluteAmount = Math.abs(netAmount); // Ensure the amount is always positive
@@ -52,10 +54,14 @@ export default function Home({ navigation }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const animationController = useRef(new Animated.Value(0)).current;
   const [graphData, setGraphData] = useState(null);
+  const [forecastData, setForecastData] = useState([]);
+  const [selectedSlice, setSelectedSlice] = useState(null);
+
   useEffect(() => {
     fetchDebts();
     fetchNetAmount();
     fetchGraphData();
+    fetchForecastData();
 
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -63,6 +69,31 @@ export default function Home({ navigation }) {
       useNativeDriver: true
     }).start();
   }, []);
+
+  const handleSelectSlice = (slice) => {
+    setSelectedSlice(slice);
+  };
+  
+  const getRandomColor = () => {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+
+  const data = forecastData.map((item, index) => ({
+    value: item.population,
+    svg: {
+        fill: item.color,
+        onPress: () => setSelectedSlice({date: moment(item.name, 'YYYY-MM-DD').format('MMM YYYY'), amount: `$${item.population.toFixed(2)}`}),
+    },
+    key: `pie-${index}`,
+}));
+
+
+  
 
   const toggleExpansion = () => {
     setIsExpanded(!isExpanded);
@@ -110,14 +141,51 @@ export default function Home({ navigation }) {
       Alert.alert("Error", "Failed to fetch net amount: " + error.message);
     }
   };
+  
+  const fetchForecastData = async () => {
+    try {
+        const token = await AsyncStorage.getItem('jwt_token');
+        const response = await axios.get('http://127.0.0.1:5000/forecast', {
+            headers: { Authorization: `Bearer ${token}` },
+        });
 
+        if (response.status === 201) {
+          setForecastData([]);  
+          return;
+      }
+      
+        const data = response.data.forecast;
+        console.log("Data:",data);
+        let totalAmount = Object.values(data).reduce((sum, current) => sum + current, 0);
+  
+        const chartData = Object.keys(data).map(date => {
+          const amount = data[date];
+          return {
+              name: date, // Keep the raw date string here
+              population: amount,
+              color: getRandomColor(),
+              legendFontColor: '#7F7F7F',
+              legendFontSize: 15,
+              onPress: () => setSelectedSlice({date: moment(date).format('MMM YYYY'), amount: `$${amount.toFixed(2)}`}),
+          };
+      });
+      
+        setForecastData(chartData);
+    } catch (error) {
+        console.error("Error fetching forecast data:", error);
+        Alert.alert("Error", "Failed to fetch forecast data: " + (error.response ? error.response.data.message : error.message));
+    }
+  };
   
 
+  
+  
   const onRefresh = () => {
     setRefreshing(true);
     fetchDebts();
     fetchNetAmount();
     fetchGraphData();
+    fetchForecastData();
   };
 
   const fetchGraphData = async () => {
@@ -224,41 +292,61 @@ export default function Home({ navigation }) {
           </>
         }
         ListFooterComponent={
-          graphData && (
-            <LineChart
-              data={graphData}
-              width={Dimensions.get("window").width}
-              height={220}
-              yAxisLabel="$"
-              yAxisInterval={1}
-              chartConfig={{
-                backgroundColor: "#fff",
-                backgroundGradientFrom: "#fff",
-                backgroundGradientTo: "#fff",
-                decimalPlaces: 2,
-                color: (opacity = 1) => `rgba(27, 201, 18, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                style: {
-                  borderRadius: 16
-                },
-                propsForDots: {
-                  r: "2",
-                  strokeWidth: "2",
-                  stroke: "black"
-                },
-                bezier: false
-              }}
-              style={{
-                marginVertical: 8,
-                borderRadius: 16,
-                shadowColor: '#071718',
-                shadowOffset: { width: 0, height: 1 },
-                shadowOpacity: 0.3,
-                shadowRadius: 3,
-              }}
-            />
-          )
-        }
+          <>
+            {graphData && (
+              <LineChart
+                data={graphData}
+                width={Dimensions.get("window").width}
+                height={220}
+                yAxisLabel="$"
+                yAxisInterval={1}
+                chartConfig={{
+                  backgroundColor: "#fff",
+                  backgroundGradientFrom: "#fff",
+                  backgroundGradientTo: "#fff",
+                  decimalPlaces: 2,
+                  color: (opacity = 1) => `rgba(27, 201, 18, ${opacity})`,
+                  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                  style: {
+                    borderRadius: 16
+                  },
+                  propsForDots: {
+                    r: "2",
+                    strokeWidth: "2",
+                    stroke: "black"
+                  },
+                  bezier: false
+                }}
+                style={{
+                  marginVertical: 8,
+                  borderRadius: 16,
+                  shadowColor: '#071718',
+                  shadowOffset: { width: 0, height: 1 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 3,
+                }}
+              />
+            )}
+            {forecastData.length > 0 && (
+              <View style={styles.selectedSliceContainer}>
+                <View style={{ height: 220, flexDirection: 'row', justifyContent: 'center' }}>
+                  <PieChart
+                    style={{ flex: 1 }}
+                    data={data}
+                    innerRadius="15%"
+                    outerRadius="95%"
+                  />
+                </View>
+                {selectedSlice && (
+                  <View style={styles.selectedSliceDetails}>
+                    <Text style={styles.selectedSliceText}>Date: {selectedSlice.date}</Text>
+                    <Text style={styles.selectedSliceText}>Amount: {selectedSlice.amount}</Text>
+                  </View>
+                )}
+              </View>
+            )}
+          </>
+        }        
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       />
     </SafeAreaView>
@@ -359,5 +447,30 @@ const styles = StyleSheet.create({
     color: '#333',
     marginTop: 10,
     fontWeight: 'bold',
+  },
+  legendContainer: {
+    marginTop: 10,
+    alignItems: 'center'
+  },
+  selectedSliceContainer: {
+    marginTop: 10,
+    marginBottom: 20, 
+    backgroundColor: '#fff',
+    marginHorizontal: 10,
+    borderRadius: 10, 
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5, 
+    padding: 15, 
+  },
+  selectedSliceDetails: {
+    marginTop: 10, 
+  },
+  selectedSliceText: {
+    fontSize: 16,
+    color: '#333', 
+    fontWeight: 'bold', 
   },
 });

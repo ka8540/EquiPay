@@ -2,3 +2,7 @@ equipay/server/.terraform/
 equipay/server/aws-secret.yaml
 equipay/server/server-deployment.yaml
 equipay/server/server-service.yaml
+__pycache__/
+venv/
+.pytest_cache/
+path/to/venv/

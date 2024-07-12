@@ -38,6 +38,7 @@ try:
     from api.delete_group_api import DeleteGroupAPI
     from api.leave_group_api import LeaveGroupAPI
     from api.add_group_members_api import AddGroupMembersAPI
+    from api.forecast_api import ForecastAPI
 except ImportError:
     from utilities.swen_344_db_utils import exec_sql_file
     from api.login_api import LoginAPI
@@ -72,6 +73,7 @@ except ImportError:
     from api.delete_group_api import DeleteGroupAPI
     from api.leave_group_api import LeaveGroupAPI
     from api.add_group_members_api import AddGroupMembersAPI
+    from api.forecast_api import ForecastAPI
 
 app = Flask(__name__)
 CORS(app)
@@ -118,6 +120,7 @@ api.add_resource(ContactListAPI, '/contact_list')
 api.add_resource(DeleteGroupAPI, '/delete_group/<int:group_id>')
 api.add_resource(LeaveGroupAPI, '/leave_group/<int:group_id>')
 api.add_resource(AddGroupMembersAPI, '/add_group_member/<int:group_id>')
+api.add_resource(ForecastAPI,'/forecast')
 def setup_database():
     print("Loading db")
     exec_sql_file('data/data.sql')

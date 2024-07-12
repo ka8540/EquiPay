@@ -117,8 +117,8 @@ VALUES ('Utility Group', 11);  -- Assuming 'CreatedBy' user_id '11' exists
 -- Insert Expenses for May and June
 INSERT INTO Expenses (PayerID, Amount, Description, Date)
 VALUES
-(11, 500.00, 'May Utilities', '2023-05-15'),
-(11, 600.00, 'June Utilities', '2023-06-15');
+(11, 500.00, 'May Utilities', '2024-05-15'),
+(11, 600.00, 'June Utilities', '2024-06-15');
 
 -- Insert corresponding Debts assuming ExpenseID 1 for May and 2 for June
 INSERT INTO Debts (ExpenseID, OwedToUserID, OwedByUserID, AmountOwed)
@@ -134,8 +134,8 @@ VALUES
 -- Insert GroupExpenses for May and June for the created group
 INSERT INTO GroupExpenses (GroupID, PayerID, Amount, Description, Date)
 VALUES
-(1, 11, 500.00, 'May Group Utilities', '2023-05-15'),
-(1, 11, 600.00, 'June Group Utilities', '2023-06-15');
+(1, 11, 500.00, 'May Group Utilities', '2024-05-15'),
+(1, 11, 600.00, 'June Group Utilities', '2024-06-15');
 
 -- Assuming ExpenseID 1 and 2 for GroupExpenses as before
 -- Insert corresponding GroupDebts
